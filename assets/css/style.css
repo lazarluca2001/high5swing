@@ -27,3 +27,136 @@ p{ color: var(--muted); line-height: 1.5; }
 .card:hover{ transform: translateY(-1px); transition: .15s ease; }
 .card h2{ margin: 0 0 6px; font-size: 18px; }
 .card p{ margin:0; }
+
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+/* ---- profile header ---- */
+.profile-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom: 16px;
+}
+
+.profile-actions .btn{
+  display:inline-block;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background: var(--card);
+}
+
+/* link-card (résztvevők kártyája kattintható legyen) */
+.link-card{
+  display:block;
+}
+.tiny{ font-size:12px; }
+.muted{ color: var(--muted); }
+
+/* ---- blocks ---- */
+.block{ margin-top: 18px; }
+.block-title{ font-size: 20px; margin: 0 0 8px; }
+.role-block{ margin-top: 10px; }
+.role-title{ font-size: 16px; margin: 10px 0 8px; color: var(--text); opacity: .9; }
+
+/* ---- results accordion cards ---- */
+.result-list{ display:flex; flex-direction:column; gap:10px; }
+
+.result-card{
+  border:1px solid var(--line);
+  background: var(--card);
+  border-radius: 16px;
+  overflow:hidden;
+}
+
+.result-summary{
+  list-style:none;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding: 12px 14px;
+}
+.result-card summary::-webkit-details-marker{ display:none; }
+
+.result-left{ min-width: 220px; }
+.result-date{ color: var(--muted); font-size: 12px; }
+.result-event{ font-size: 16px; font-weight: 800; margin-top: 4px; }
+
+.result-right{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.result-col{
+  width: 90px;
+  text-align:right;
+}
+.result-label{ color: var(--muted); font-size: 12px; }
+.result-value{ font-size: 18px; font-weight: 900; }
+
+.result-body{
+  border-top: 1px solid var(--line);
+  padding: 12px 14px;
+}
+
+.result-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+}
+
+.kv{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding: 8px 10px;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+}
+
+.mono{ font-variant-numeric: tabular-nums; }
+
+/* mobil */
+@media (max-width: 640px){
+  .result-summary{ flex-direction:column; }
+  .result-right{ justify-content:flex-end; }
+  .result-col{ width:auto; text-align:left; }
+  .result-grid{ grid-template-columns: 1fr; }
+}
+
+/* Legend szerinti színek */
+.newcomer{
+  background:#c678dd33;
+  color:#d2a8ff;
+}
+
+.novice{
+  background:#3ec1e833;
+  color:#64d2ff;
+}
+
+.intermediate{
+  background:#ffd16633;
+  color:#ffe08a;
+}
+
+.profile-link{
+  display:inline-block;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+}
+.profile-link:hover{
+  background: rgba(255,255,255,0.06);
+}

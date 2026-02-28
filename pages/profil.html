@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Résztvevők – High Five Swing</title>
+  <title>Profil – High Five Swing</title>
   <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body>
@@ -17,12 +17,17 @@
   </header>
 
   <main class="container">
-    <section>
-        <h1>Résztvevők</h1>
-        <p class="muted">Adatok Google Sheets CSV-ből.</p>
+    <div class="profile-head">
+      <div>
+        <h1 id="profileName">Profil</h1>
+        <p class="muted" id="profileSub">Versenyeredmények (Sheets import)</p>
+      </div>
+      <div class="profile-actions">
+        <a class="btn" href="./resztvevok.html">← Vissza</a>
+      </div>
+    </div>
 
-        <div id="participants" class="cards"></div>
-    </section>
+    <div id="profileContent"></div>
   </main>
 
   <script src="../assets/js/main.js"></script>
