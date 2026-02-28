@@ -1,1 +1,1 @@
-console.log("HFS site működik!");
+console.log("High Five Swing site loaded ✅");
