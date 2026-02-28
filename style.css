@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="hu" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HFS 2026 – Résztvevők</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="resztvevok.css">
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="brand">HFS PERFORMANCE 2026</div>
+    <a href="naptar.html">Naptár</a>
+    <a href="resztvevok.html" class="active">Résztvevők</a>
+
+    <div class="nav-spacer"></div>
+
+    <div class="theme-switch-wrapper">
+      <span>Sötét mód</span>
+      <label class="theme-switch">
+        <input type="checkbox" id="themeToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </nav>
+
+  <div class="main-layout">
+    <aside class="sidebar">
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">KÖVETKEZŐ ÁLLOMÁS</div>
+        <div id="nextEventTitle" class="next-title">–</div>
+        <div id="nextEventCountdown" class="next-sub">–</div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">TAGOK SZŰRÉSE</div>
+        <div id="memberFilter" class="member-filter"></div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">GYORS STAT</div>
+        <div class="quick-stats">
+          <div class="qs-item">
+            <div class="qs-label">Összes indulás</div>
+            <div class="qs-value" id="qsStarts">–</div>
+          </div>
+          <div class="qs-item">
+            <div class="qs-label">Összpont</div>
+            <div class="qs-value" id="qsPoints">–</div>
+          </div>
+          <div class="qs-item">
+            <div class="qs-label">Aktív divízió</div>
+            <div class="qs-value" id="qsDivs">–</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-card subtle">
+        <div class="sidebar-title">TIPP</div>
+        <div class="muted">
+          Kattints egy tagra. A fő tartalomban megjelenik az adatlap, a versenyek lenyithatók.
+        </div>
+        <div id="loadError" class="error"></div>
+      </div>
+
+    </aside>
+
+    <main class="content-area">
+      <div id="mainContent"></div>
+    </main>
+  </div>
+
+  <script src="common.js"></script>
+  <script src="resztvevok.js"></script>
+</body>
+</html>
