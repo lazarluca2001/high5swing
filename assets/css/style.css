@@ -1,5 +1,5 @@
 /* ================================
-   HFS COMMUNITY UI – CLEAN & FIXED
+   HFS COMMUNITY UI – FINAL STYLESHEET (FIXED)
    ================================ */
 
 /* --- VÁLTOZÓK ÉS TÉMÁK --- */
@@ -31,12 +31,16 @@
 [data-theme="dark"] {
   --bg-color: #0a0a0a;
   --card-bg: #1a1a1a;
+
   --text-color: #f0f0f0;
   --text-muted: #aaa;
+
   --border-color: #333;
   --nav-bg: #1e1e1e;
+
   --hfs-red: #ff4d4d;
   --hfs-light-red: #2d1a1a;
+
   --shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 
@@ -56,25 +60,17 @@ body {
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
-/* ================================
-   ŰRLAPOK ÉS INPUTOK (ÚJ)
-   ================================ */
-input, select, textarea {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
-  color: var(--text-color);
-  font-size: 14px;
-  transition: all 0.2s ease;
-  outline: none;
+.muted { color: var(--text-muted); }
+.tiny { font-size: 12px; color: var(--text-muted); }
+.mono { font-variant-numeric: tabular-nums; }
+
+h1 {
+  margin: 0 0 10px;
+  font-size: clamp(28px, 3vw, 42px);
+  letter-spacing: -0.6px;
 }
 
-input:focus {
-  border-color: var(--hfs-red);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hfs-red) 15%, transparent);
-}
+p { margin: 0 0 12px; line-height: 1.55; }
 
 /* ================================
    TOPBAR & NAVIGÁCIÓ
@@ -83,10 +79,12 @@ input:focus {
   position: sticky;
   top: 0;
   z-index: 50;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 14px;
+
   padding: 14px 18px;
   background: color-mix(in srgb, var(--nav-bg) 95%, transparent);
   border-bottom: 1px solid var(--border-color);
@@ -109,93 +107,32 @@ input:focus {
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--hfs-red) 20%, transparent);
 }
 
-.nav { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .nav a {
   padding: 9px 16px;
   border-radius: 999px;
   color: var(--text-muted);
-  font-weight: 600;
-  transition: all 0.2s ease;
+  font-weight: 650;
+  transition: all 0.18s ease;
+  border: 1px solid transparent;
 }
 
 .nav a:hover {
   background: var(--hfs-light-red);
   color: var(--hfs-red);
+  border-color: color-mix(in srgb, var(--hfs-red) 18%, var(--border-color));
 }
 
 .nav a.active {
   background: var(--hfs-red);
+  border-color: var(--hfs-red);
   color: #fff;
   box-shadow: 0 8px 16px color-mix(in srgb, var(--hfs-red) 20%, transparent);
 }
 
 /* ================================
-   SÖTÉT MÓD KAPCSOLÓ (SWITCH)
-   ================================ */
-.switch {
-  position: relative;
-  width: 46px;
-  height: 26px;
-  background: var(--border-color);
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.switch::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.switch[data-on="true"] {
-  background: var(--hfs-red);
-}
-
-.switch[data-on="true"]::after {
-  transform: translateX(20px);
-}
-
-/* ================================
-   GOMB RENDSZER
-   ================================ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
-  color: var(--text-color);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-primary {
-  background: var(--hfs-red);
-  color: #fff;
-  border-color: var(--hfs-red);
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  border-color: var(--hfs-red);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-}
-
-/* ================================
-   LAYOUT & CARDS
+   LAYOUT & SIDEBAR
    ================================ */
 .shell {
   max-width: 1320px;
@@ -210,6 +147,13 @@ input:focus {
   align-items: start;
 }
 
+/* a main.container megmarad – csak layoutban lesz a 2. oszlop */
+.container {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
 .sidebar {
   position: sticky;
   top: 80px;
@@ -217,6 +161,36 @@ input:focus {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.sidebar-head {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  background:
+    radial-gradient(700px 220px at 10% 0%,
+      color-mix(in srgb, var(--hfs-red) 12%, transparent),
+      transparent 60%),
+    var(--card-bg);
+}
+
+.sidebar-title{
+  font-weight: 950;
+  letter-spacing: -0.2px;
+  margin: 0;
+}
+
+.sidebar-sub{
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sidebar-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .side-card {
@@ -224,44 +198,275 @@ input:focus {
   background: color-mix(in srgb, var(--card-bg) 94%, var(--hfs-light-red));
   border-radius: var(--radius-lg);
   padding: 12px;
-  margin: 12px;
 }
+
+.side-card h3{
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ✅ EZ HIÁNYZOTT NÁLAD: oldalsáv navigáció normális elrendezése */
+.side-nav{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.side-link{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+
+  color: var(--text-color);
+  background: transparent;
+  transition: all 0.16s ease;
+  font-weight: 650;
+}
+
+.side-link .hint{
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.side-link:hover{
+  background: var(--hfs-light-red);
+  border-color: color-mix(in srgb, var(--hfs-red) 16%, var(--border-color));
+  transform: translateY(-1px);
+}
+
+.side-link.active{
+  background: color-mix(in srgb, var(--hfs-red) 10%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--hfs-red) 30%, var(--border-color));
+}
+
+/* Theme toggle */
+.theme-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 12px;
+}
+
+.switch{
+  position: relative;
+  width: 46px;
+  height: 28px;
+  background: color-mix(in srgb, var(--border-color) 60%, transparent);
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: .15s ease;
+}
+.switch::after{
+  content:"";
+  position:absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  transition: .15s ease;
+}
+.switch[data-on="true"]{
+  background: color-mix(in srgb, var(--hfs-red) 20%, transparent);
+  border-color: color-mix(in srgb, var(--hfs-red) 35%, var(--border-color));
+}
+.switch[data-on="true"]::after{
+  transform: translateX(18px);
+}
+
+/* ================================
+   PAGE HERO
+   ================================ */
+.page-hero {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+
+/* ================================
+   RÉSZTVEVŐK KÁRTYÁK (GRID)
+   ================================ */
+.cards{
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.card{
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+.card:hover{
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--hfs-red) 25%, var(--border-color));
+  box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+}
+
+.card h2{
+  margin: 0 0 10px;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+}
+
+.profile-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--hfs-red) 16%, var(--border-color));
+  background: color-mix(in srgb, var(--hfs-light-red) 65%, var(--card-bg));
+  font-weight: 700;
+  transition: .16s ease;
+}
+
+.profile-link:hover{
+  background: color-mix(in srgb, var(--hfs-light-red) 85%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--hfs-red) 30%, var(--border-color));
+}
+
+/* division badge-ek */
+.badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: color-mix(in srgb, var(--card-bg) 90%, var(--hfs-light-red));
+}
+
+.badge.newcomer{
+  background: color-mix(in srgb, var(--hfs-light-red) 75%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--hfs-red) 28%, var(--border-color));
+  color: var(--hfs-red);
+}
+.badge.novice{
+  background: #e8f3ff;
+  border-color: #b9d7ff;
+  color: #1e5aa8;
+}
+.badge.intermediate{
+  background: #fff7e6;
+  border-color: #ffe0a6;
+  color: #8a5a00;
+}
+.badge.advanced{
+  background: #efeaff;
+  border-color: #d7c8ff;
+  color: #4a2a9b;
+}
+.badge.allstar{
+  background: #e9fff3;
+  border-color: #bdf1d4;
+  color: #1f7a4b;
+}
+.badge.champion{
+  background: #111;
+  border-color: #222;
+  color: #fff;
+}
+
+/* ================================
+   PROFIL HEADER (profil.html)
+   ================================ */
+.profile-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* ================================
+   EREDMÉNYEK (Accordion)
+   ================================ */
+.block{ margin-top: 18px; }
+.block-title{ font-size: 20px; margin: 0 0 8px; }
+
+.result-list{ display:flex; flex-direction:column; gap: 10px; }
 
 .result-card {
   border: 1px solid var(--border-color);
   background: var(--card-bg);
   border-radius: var(--radius-lg);
-  margin-bottom: 12px;
   overflow: hidden;
   box-shadow: var(--shadow);
 }
 
 .result-summary {
+  list-style: none;
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   padding: 16px;
   background: color-mix(in srgb, var(--hfs-light-red) 35%, transparent);
   cursor: pointer;
 }
+.result-card summary::-webkit-details-marker{ display:none; }
 
-/* STATISZTIKÁK */
-.event-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
+.result-left{ min-width: 220px; }
+.result-date{ font-size: 12px; color: var(--text-muted); }
+.result-event{ margin-top: 4px; font-size: 16px; font-weight: 900; }
+
+.result-right{ display:flex; gap: 14px; align-items:center; }
+.result-col{ width: 90px; text-align: right; }
+.result-label{ font-size: 12px; color: var(--text-muted); }
+.result-value{ font-size: 18px; font-weight: 950; }
+
+.result-body{
+  border-top: 1px solid var(--border-color);
+  padding: 0;
+}
+
+/* lenyílás utáni stat rész */
+.result-body.event-body{
   padding: 16px;
 }
 
+.event-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.event-stats.cols-3{ grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+.event-stats.cols-2{ grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+.event-stats.cols-1{ grid-template-columns: 1fr; }
+
 .stat {
-  background: color-mix(in srgb, var(--card-bg) 96%, var(--hfs-red));
+  background: color-mix(in srgb, var(--card-bg) 96%, var(--hfs-light-red));
   border: 1px solid color-mix(in srgb, var(--hfs-red) 10%, var(--border-color));
   padding: 12px;
   border-radius: var(--radius-md);
   text-align: center;
-  min-height: 85px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-height: 85px;
 }
 
 .stat .slabel {
@@ -269,17 +474,19 @@ input:focus {
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: var(--text-muted);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .stat .svalue {
-  font-size: 20px;
-  font-weight: 900;
+  font-size: 22px;
+  font-weight: 950;
   color: var(--hfs-red);
+  line-height: 1.1;
 }
 
 .stat.partner .svalue {
   font-size: 15px;
+  word-break: break-word;
 }
 
 /* ================================
@@ -288,10 +495,21 @@ input:focus {
 @media (max-width: 980px) {
   .layout { grid-template-columns: 1fr; }
   .sidebar { position: relative; top: 0; }
+  .sidebar-body { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .side-card:nth-child(1) { grid-column: span 2; } /* Navigáció szélesebb */
 }
 
 @media (max-width: 600px) {
-  .topbar { flex-direction: column; padding: 10px; }
+  .topbar { flex-direction: column; padding: 10px; gap: 12px; }
   .nav { width: 100%; justify-content: center; }
+  .nav a { flex: 1; text-align: center; font-size: 13px; padding: 8px 4px; }
+
+  .sidebar-body { grid-template-columns: 1fr; }
+
+  .result-summary { flex-direction: column; gap: 10px; }
+  .result-col { width: auto; text-align: left; }
+
   .event-stats { grid-template-columns: 1fr 1fr; }
+  .stat .svalue { font-size: 18px; }
+  .stat.partner .svalue { font-size: 14px; }
 }
