@@ -1,5 +1,6 @@
 /* ================================
    HFS COMMUNITY UI – TELJES CSS
+   + Résztvevők: tag-kártyák divízió színekkel
    ================================ */
 
 :root {
@@ -17,6 +18,11 @@
   --radius-lg: 14px;
   --radius-md: 12px;
   --sidebar-w: 280px;
+
+  /* tag tokenek */
+  --tag-radius: 14px;
+  --tag-pad-y: 10px;
+  --tag-pad-x: 12px;
 }
 
 [data-theme="dark"] {
@@ -70,9 +76,10 @@ a { color: inherit; text-decoration: none; }
 .nav a {
   padding: 8px 16px; border-radius: 999px;
   color: var(--text-muted); font-weight: 600; transition: 0.2s ease;
+  border: 1px solid transparent;
 }
-.nav a.active { background: var(--hfs-red); color: #fff; }
-.nav a:hover:not(.active) { background: var(--hfs-light-red); color: var(--hfs-red); }
+.nav a.active { background: var(--hfs-red); color: #fff; border-color: var(--hfs-red); }
+.nav a:hover:not(.active) { background: var(--hfs-light-red); color: var(--hfs-red); border-color: color-mix(in srgb, var(--hfs-red) 18%, var(--border-color)); }
 
 /* --- LAYOUT --- */
 .shell { max-width: 1320px; margin: 0 auto; padding: 20px; }
@@ -102,15 +109,24 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid color-mix(in srgb, var(--hfs-red) 10%, var(--border-color));
 }
 
-.side-card h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px; }
+.side-card h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
 
-.side-nav { display: flex; flex-direction: column; gap: 4px; }
+/* sidebar nav */
+.side-nav { display: flex; flex-direction: column; gap: 6px; }
 .side-link {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 12px; border-radius: var(--radius-md); font-weight: 600; transition: 0.2s;
+  padding: 10px 12px; border-radius: var(--radius-md); font-weight: 650; transition: 0.2s;
+  border: 1px solid transparent;
 }
-.side-link:hover { background: var(--hfs-light-red); color: var(--hfs-red); }
+.side-link:hover { background: var(--hfs-light-red); color: var(--hfs-red); border-color: color-mix(in srgb, var(--hfs-red) 18%, var(--border-color)); }
 .side-link.active { background: var(--hfs-light-red); color: var(--hfs-red); border: 1px solid color-mix(in srgb, var(--hfs-red) 20%, transparent); }
+.side-link .hint { font-size: 12px; color: var(--text-muted); font-weight: 600; }
 
 /* --- TARTALOM ELEMEK --- */
 .page-hero {
@@ -124,31 +140,199 @@ a { color: inherit; text-decoration: none; }
   background: var(--card-bg); padding: 20px; border-radius: var(--radius-xl);
   border: 1px solid var(--border-color); box-shadow: var(--shadow); transition: 0.2s ease;
 }
-.card:hover { transform: translateY(-4px); border-color: var(--hfs-red); }
+.card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--hfs-red) 35%, var(--border-color)); }
 
 .badge {
   display: inline-flex; padding: 5px 12px; border-radius: 999px;
   font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 8px 0;
+  border: 1px solid rgba(0,0,0,0.06);
 }
-.badge.novice { background: #e8f3ff; color: #1e5aa8; }
-.badge.newcomer { background: var(--hfs-light-red); color: var(--hfs-red); }
+
+/* division badge-ek (kártyákon) */
+.badge.newcomer { background: var(--hfs-light-red); color: var(--hfs-red); border-color: color-mix(in srgb, var(--hfs-red) 22%, var(--border-color)); }
+.badge.novice { background: #e8f3ff; color: #1e5aa8; border-color: #b9d7ff; }
+.badge.intermediate { background: #fff7e6; color: #8a5a00; border-color: #ffe0a6; }
+.badge.advanced { background: #efeaff; color: #4a2a9b; border-color: #d7c8ff; }
+.badge.allstar { background: #e9fff3; color: #1f7a4b; border-color: #bdf1d4; }
+.badge.champion { background: #111; color: #fff; border-color: #222; }
 
 .profile-link {
-  display: inline-block; margin-top: 12px; font-weight: 700; color: var(--hfs-red);
+  display: inline-block; margin-top: 12px; font-weight: 800; color: var(--hfs-red);
 }
 
 /* --- STATISZTIKÁK (LENYÍLÓ) --- */
 .result-card { border: 1px solid var(--border-color); background: var(--card-bg); border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden; }
-.result-summary { display: flex; justify-content: space-between; padding: 16px; cursor: pointer; background: color-mix(in srgb, var(--hfs-light-red) 30%, transparent); }
+.result-summary { display: flex; justify-content: space-between; gap: 12px; padding: 16px; cursor: pointer; background: color-mix(in srgb, var(--hfs-light-red) 30%, transparent); }
 .event-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; padding: 16px; }
 
 .stat {
   background: color-mix(in srgb, var(--card-bg) 97%, var(--hfs-red));
   border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md); text-align: center;
 }
-.stat .slabel { font-size: 10px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
-.stat .svalue { font-size: 18px; font-weight: 900; color: var(--hfs-red); }
+.stat .slabel { font-size: 10px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; letter-spacing: .8px; }
+.stat .svalue { font-size: 18px; font-weight: 950; color: var(--hfs-red); }
 .stat.partner .svalue { font-size: 14px; }
+
+/* =========================================================
+   ✅ RÉSZTVEVŐK – TAG KÁRTYÁK (filter chipek)
+   ---------------------------------------------------------
+   Használd bármelyik konténert:
+   - .member-selector   (korábbi)
+   - .tag-grid / .tag-list
+   és elemek:
+   - .member-card / .tag-card / .tag
+   és adj a tagre divízió osztályt:
+   .newcomer / .novice / .intermediate / .advanced / .allstar / .champion
+   ========================================================= */
+
+/* konténer (több név kompatibilitás) */
+.member-selector,
+.tag-grid,
+.tag-list,
+.tags {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* tag alap (button/a/div mind jó) */
+.member-card,
+.tag-card,
+.tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  width: 100%;
+  padding: var(--tag-pad-y) var(--tag-pad-x);
+
+  border-radius: var(--tag-radius);
+  border: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--card-bg) 96%, transparent);
+
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: var(--text-color);
+
+  cursor: pointer;
+  user-select: none;
+  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease, background .14s ease;
+}
+
+/* hover */
+.member-card:hover,
+.tag-card:hover,
+.tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+}
+
+/* ikon (ha van emoji span) */
+.member-card .icon,
+.tag-card .icon,
+.tag .icon {
+  width: 20px;
+  display: inline-flex;
+  justify-content: center;
+}
+
+/* active állapot – tedd rá JS-ben: .active vagy aria-pressed=true */
+.member-card.active,
+.tag-card.active,
+.tag.active,
+.member-card[aria-pressed="true"],
+.tag-card[aria-pressed="true"],
+.tag[aria-pressed="true"] {
+  box-shadow: 0 12px 24px rgba(0,0,0,0.14);
+  transform: translateY(-1px);
+}
+
+/* -------- Division színek: TAGOKRA -------- */
+/* Newcomer */
+.member-card.newcomer, .tag-card.newcomer, .tag.newcomer{
+  border-color: color-mix(in srgb, var(--hfs-red) 28%, var(--border-color));
+  background: color-mix(in srgb, var(--hfs-light-red) 85%, var(--card-bg));
+  color: var(--hfs-red);
+}
+/* Novice */
+.member-card.novice, .tag-card.novice, .tag.novice{
+  border-color: #b9d7ff;
+  background: #e8f3ff;
+  color: #1e5aa8;
+}
+/* Intermediate */
+.member-card.intermediate, .tag-card.intermediate, .tag.intermediate{
+  border-color: #ffe0a6;
+  background: #fff7e6;
+  color: #8a5a00;
+}
+/* Advanced */
+.member-card.advanced, .tag-card.advanced, .tag.advanced{
+  border-color: #d7c8ff;
+  background: #efeaff;
+  color: #4a2a9b;
+}
+/* All Star */
+.member-card.allstar, .tag-card.allstar, .tag.allstar{
+  border-color: #bdf1d4;
+  background: #e9fff3;
+  color: #1f7a4b;
+}
+/* Champion */
+.member-card.champion, .tag-card.champion, .tag.champion{
+  border-color: #222;
+  background: #111;
+  color: #fff;
+}
+
+/* active állapot divíziónként (erősebb) */
+.member-card.newcomer.active, .tag-card.newcomer.active, .tag.newcomer.active,
+.member-card.newcomer[aria-pressed="true"], .tag-card.newcomer[aria-pressed="true"], .tag.newcomer[aria-pressed="true"]{
+  background: color-mix(in srgb, var(--hfs-red) 16%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--hfs-red) 55%, var(--border-color));
+}
+
+.member-card.novice.active, .tag-card.novice.active, .tag.novice.active,
+.member-card.novice[aria-pressed="true"], .tag-card.novice[aria-pressed="true"], .tag.novice[aria-pressed="true"]{
+  background: color-mix(in srgb, #b9d7ff 28%, #e8f3ff);
+  border-color: #7db3ff;
+}
+
+.member-card.intermediate.active, .tag-card.intermediate.active, .tag.intermediate.active,
+.member-card.intermediate[aria-pressed="true"], .tag-card.intermediate[aria-pressed="true"], .tag.intermediate[aria-pressed="true"]{
+  background: color-mix(in srgb, #ffe0a6 30%, #fff7e6);
+  border-color: #ffcc66;
+}
+
+.member-card.advanced.active, .tag-card.advanced.active, .tag.advanced.active,
+.member-card.advanced[aria-pressed="true"], .tag-card.advanced[aria-pressed="true"], .tag.advanced[aria-pressed="true"]{
+  background: color-mix(in srgb, #d7c8ff 30%, #efeaff);
+  border-color: #b39cff;
+}
+
+.member-card.allstar.active, .tag-card.allstar.active, .tag.allstar.active,
+.member-card.allstar[aria-pressed="true"], .tag-card.allstar[aria-pressed="true"], .tag.allstar[aria-pressed="true"]{
+  background: color-mix(in srgb, #bdf1d4 28%, #e9fff3);
+  border-color: #6fe0a4;
+}
+
+.member-card.champion.active, .tag-card.champion.active, .tag.champion.active,
+.member-card.champion[aria-pressed="true"], .tag-card.champion[aria-pressed="true"], .tag.champion[aria-pressed="true"]{
+  background: #000;
+  border-color: #555;
+}
+
+/* ---------------------------------------------------------
+   Dark mode finomhangolás a tagokra
+   --------------------------------------------------------- */
+[data-theme="dark"] .member-card,
+[data-theme="dark"] .tag-card,
+[data-theme="dark"] .tag{
+  border-color: color-mix(in srgb, var(--border-color) 90%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+}
 
 /* --- TÉMA KAPCSOLÓ --- */
 .switch { width: 44px; height: 24px; background: #ccc; border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s; }
@@ -160,7 +344,17 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
   .sidebar { position: static; margin-bottom: 20px; }
-  .sidebar-body { display: grid; grid-template-columns: 1fr 1fr; }
+  .sidebar-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .side-card:nth-child(1){ grid-column: span 2; }
+}
+
+@media (max-width: 700px){
+  .member-selector,
+  .tag-grid,
+  .tag-list,
+  .tags{
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 600px) {
