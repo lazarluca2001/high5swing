@@ -8,7 +8,10 @@ const PARTICIPANTS_CSV =
 const RESULTS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSDDBNbIkZize7hPMfYPovbLgnIFWNuseLg0mjzDYGhLCwEEiF_-CiXnV76lgg2mvb54QabZ8y3Sork/pub?gid=1410406652&single=true&output=csv";
 
-// --- CSV parser ---
+/* ---------------------------
+   Utils
+--------------------------- */
+
 function parseCSV(text) {
   const rows = [];
   let row = [];
@@ -55,9 +58,6 @@ function safeText(v) {
   return (v ?? "").toString().trim();
 }
 
-/**
- * Igaz, ha tényleges adat (nem üres és nem "-" / "—" stb.)
- */
 function hasValue(v) {
   const s = safeText(v);
   if (!s) return false;
@@ -74,13 +74,123 @@ function getParam(name) {
   return url.searchParams.get(name);
 }
 
-// --- Résztvevők badge színek (Novice/Intermediate/...) ---
 function divisionToClassParticipants(division) {
   return safeText(division).toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
+/* ---------------------------
+   GLOBAL SIDEBAR (inject)
+--------------------------- */
+
+function getCurrentPageKey() {
+  const p = (location.pathname || "").toLowerCase();
+  if (p.includes("naptar")) return "naptar";
+  if (p.includes("resztvevok")) return "resztvevok";
+  if (p.includes("profil")) return "resztvevok";
+  return "kezdo";
+}
+
+function initTheme() {
+  const saved = localStorage.getItem("theme");
+  if (saved === "dark") document.documentElement.dataset.theme = "dark";
+  else delete document.documentElement.dataset.theme;
+}
+
+function setTheme(mode) {
+  if (mode === "dark") {
+    document.documentElement.dataset.theme = "dark";
+    localStorage.setItem("theme", "dark");
+  } else {
+    delete document.documentElement.dataset.theme;
+    localStorage.setItem("theme", "light");
+  }
+}
+
+function injectSidebarLayout() {
+  // már injektált?
+  if (document.querySelector(".layout") && document.querySelector(".sidebar")) return;
+
+  const main = document.querySelector("main.container");
+  if (!main) return;
+
+  // burkoljuk be a main-t egy shell/layout rendszerbe
+  const shell = document.createElement("div");
+  shell.className = "shell";
+
+  const layout = document.createElement("div");
+  layout.className = "layout";
+
+  const sidebar = document.createElement("aside");
+  sidebar.className = "sidebar";
+
+  const pageKey = getCurrentPageKey();
+
+  // sidebar tartalom
+  sidebar.innerHTML = `
+    <div class="sidebar-head">
+      <div class="sidebar-title">HFS 2026</div>
+      <div class="sidebar-sub">Community dashboard</div>
+    </div>
+
+    <div class="sidebar-body">
+      <div class="side-card">
+        <h3>Navigáció</h3>
+        <div class="side-nav">
+          <a class="side-link ${pageKey === "kezdo" ? "active" : ""}" href="../index.html">
+            <span>🏠 Kezdőlap</span><span class="hint">overview</span>
+          </a>
+          <a class="side-link ${pageKey === "naptar" ? "active" : ""}" href="./naptar.html">
+            <span>🗓️ Naptár</span><span class="hint">eventek</span>
+          </a>
+          <a class="side-link ${pageKey === "resztvevok" ? "active" : ""}" href="./resztvevok.html">
+            <span>👥 Résztvevők</span><span class="hint">profilok</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <h3>Téma</h3>
+        <div class="theme-row">
+          <div>
+            <div class="big">Sötét mód</div>
+            <div class="tiny muted">megőrizve böngészőben</div>
+          </div>
+          <div id="themeSwitch" class="switch" data-on="false" aria-label="Dark mode"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Layout összerakás: sidebar + main
+  const mainParent = main.parentNode;
+  const placeholder = document.createComment("main-placeholder");
+  mainParent.insertBefore(placeholder, main);
+
+  layout.appendChild(sidebar);
+  layout.appendChild(main);
+
+  shell.appendChild(layout);
+
+  // tegyük vissza ugyanoda, ahol a main volt
+  mainParent.insertBefore(shell, placeholder);
+  mainParent.removeChild(placeholder);
+
+  // theme switch
+  const sw = document.getElementById("themeSwitch");
+  if (sw) {
+    const isDark = document.documentElement.dataset.theme === "dark";
+    sw.dataset.on = isDark ? "true" : "false";
+
+    sw.addEventListener("click", () => {
+      const nowDark = document.documentElement.dataset.theme === "dark";
+      setTheme(nowDark ? "light" : "dark");
+      sw.dataset.on = (!nowDark) ? "true" : "false";
+    });
+  }
+}
+
 /* =========================================================
-   RÉSZTVEVŐK LISTA (resztvevok.html)
+   Résztvevők (resztvevok.html)
    ========================================================= */
 
 function renderParticipants(list) {
@@ -156,13 +266,8 @@ async function loadParticipantsFromSheet() {
 }
 
 /* =========================================================
-   PROFIL + EREDMÉNYEK (profil.html)
+   Profil + eredmények (profil.html)
    ========================================================= */
-
-function parseScoreXY(v) {
-  const s = safeText(v);
-  return s || "";
-}
 
 function parseDateToSortable(dateStr) {
   const s = safeText(dateStr);
@@ -171,7 +276,6 @@ function parseDateToSortable(dateStr) {
   const iso = Date.parse(s);
   if (!Number.isNaN(iso)) return iso;
 
-  // DD.MM.YYYY vagy DD/MM/YYYY
   const m = s.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})$/);
   if (m) {
     const dd = Number(m[1]);
@@ -189,11 +293,9 @@ function getRoleFieldSize(roleNorm, leaderCount, followerCount) {
   return safeText(leaderCount) || safeText(followerCount) || "";
 }
 
-// --- Sorrendek ---
 const ROLE_ORDER = ["leader", "follower"];
 const DIVISION_ORDER = ["champion", "allstar", "advanced", "intermediate", "novice", "newcomer"];
 
-// Normalizálás
 function normKey(s) {
   return safeText(s).toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
@@ -240,12 +342,6 @@ function prettyDivision(divNorm, original) {
   return safeText(original) || divNorm;
 }
 
-/**
- * Egy item (event) – lenyitható kártya:
- * summary: dátum + event + helyezés + pont
- * open után: screenshot-szerű stat blokkok
- * - Semi/Partner csak ha van adat
- */
 function renderResultItem(it) {
   const date = safeText(it.date) || "—";
   const event = safeText(it.event) || "—";
@@ -271,7 +367,6 @@ function renderResultItem(it) {
       </div>
     `);
   }
-
   if (prelim) {
     stats.push(`
       <div class="stat">
@@ -280,7 +375,6 @@ function renderResultItem(it) {
       </div>
     `);
   }
-
   if (semi) {
     stats.push(`
       <div class="stat">
@@ -289,7 +383,6 @@ function renderResultItem(it) {
       </div>
     `);
   }
-
   if (partner) {
     stats.push(`
       <div class="stat partner">
@@ -350,7 +443,6 @@ function renderProfile(groups) {
     return;
   }
 
-  // összes role összegyűjtése
   const allRolesSet = new Set();
   for (const div of divisions) {
     for (const role of Object.keys(groups[div])) allRolesSet.add(role);
@@ -367,7 +459,6 @@ function renderProfile(groups) {
           const items = groups[divisionKey]?.[roleKey];
           if (!items || !items.length) return "";
 
-          // division cím az első item eredetijéből
           const divTitle = prettyDivision(normDivision(divisionKey), items[0].divisionOriginal);
 
           return `
@@ -393,9 +484,6 @@ function renderProfile(groups) {
     .join("");
 }
 
-/**
- * Accordion: ha egy details nyílik, zárjuk a többieket
- */
 function initAccordion(rootSelector = "#profileContent") {
   const root = document.querySelector(rootSelector);
   if (!root) return;
@@ -431,8 +519,6 @@ async function loadProfileFromSheet() {
   const text = await res.text();
   const rows = parseCSV(text);
 
-  // B=1 Name, C=2 Division, D=3 Event, E=4 Date, F=5 Role, G=6 Leader, H=7 Follower,
-  // I=8 Prelim, J=9 Semi, K=10 Final, L=11 Point, S=18 Partner
   const dataStart = 4;
 
   const COL_NAME = 1;
@@ -448,7 +534,6 @@ async function loadProfileFromSheet() {
   const COL_POINT = 11;
   const COL_PARTNER = 18;
 
-  // groups: { [divisionKey]: { [roleNorm]: [items...] } }
   const groups = {};
 
   for (let r = dataStart; r < rows.length; r++) {
@@ -486,7 +571,6 @@ async function loadProfileFromSheet() {
     groups[divisionKey][roleNorm].push(item);
   }
 
-  // Rendezés: legfrissebb elöl
   for (const div of Object.keys(groups)) {
     for (const role of Object.keys(groups[div])) {
       groups[div][role].sort((a, b) => b._sort - a._sort);
@@ -497,11 +581,14 @@ async function loadProfileFromSheet() {
   initAccordion("#profileContent");
 }
 
-/* =========================================================
+/* ---------------------------
    INIT
-   ========================================================= */
+--------------------------- */
 
 document.addEventListener("DOMContentLoaded", () => {
+  initTheme();
+  injectSidebarLayout();
+
   const participantsRoot = document.getElementById("participants");
   const profileRoot = document.getElementById("profileContent");
 
