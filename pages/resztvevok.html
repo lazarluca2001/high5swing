@@ -17,12 +17,28 @@
   </header>
 
   <main class="container">
-    <section>
-        <h1>Résztvevők</h1>
-        <p class="muted">Adatok Google Sheets CSV-ből.</p>
+    <section class="page-hero">
+  <h1>Résztvevők</h1>
+  <p class="muted">Adatok Google Sheets CSV-ből.</p>
 
-        <div id="participants" class="cards"></div>
-    </section>
+  <div class="meta">
+    <span class="pill">🕺 <b>Community</b> · élő frissítés</span>
+    <span class="pill">📊 <b>Statisztika</b> · eredmények & eventek</span>
+    <span class="pill">🔥 <b>HFS</b> · 2026 szezon</span>
+  </div>
+
+  <!-- opcionális kereső (ha később JS-sel szűrnél) -->
+  <div class="toolbar">
+    <div class="input">
+      <span class="tiny">🔎</span>
+      <input id="search" type="search" placeholder="Keresés névre…" />
+    </div>
+    <button class="btn">Szűrés</button>
+    <button class="btn primary">+ Új event</button>
+  </div>
+</section>
+
+<div id="participants" class="cards"></div>
   </main>
 
   <script src="../assets/js/main.js"></script>
