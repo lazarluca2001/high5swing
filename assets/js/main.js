@@ -55,6 +55,13 @@ function safeText(v) {
   return (v ?? "").toString().trim();
 }
 
+function hasValue(v) {
+  const s = safeText(v);
+  if (!s) return false;
+  const n = s.toLowerCase();
+  return !["-", "—", "–", "n/a", "na", "null", "undefined"].includes(n);
+}
+
 function normName(s) {
   return safeText(s).toLowerCase();
 }
@@ -235,19 +242,28 @@ function renderResultItem(it) {
   const date = safeText(it.date) || "—";
   const event = safeText(it.event) || "—";
 
-  const finalPlace = safeText(it.final) || "—";
-  const points = safeText(it.points) || "—";
+  const finalPlace = hasValue(it.final) ? safeText(it.final) : "—";
+  const points = hasValue(it.points) ? safeText(it.points) : "—";
 
-  const prelim = parseScoreXY(it.prelim);
-  const semi = parseScoreXY(it.semi);
+  const prelim = hasValue(it.prelim) ? safeText(it.prelim) : "";
+  const semi = hasValue(it.semi) ? safeText(it.semi) : "";
 
-  const fieldSize = getRoleFieldSize(it.roleNorm, it.leaderCount, it.followerCount);
-  const partner = safeText(it.partner);
+  const fieldSize = hasValue(getRoleFieldSize(it.roleNorm, it.leaderCount, it.followerCount))
+    ? getRoleFieldSize(it.roleNorm, it.leaderCount, it.followerCount)
+    : "";
+
+  const partner = hasValue(it.partner) ? safeText(it.partner) : "";
 
   const prelimRow = prelim ? `<div class="kv"><span>Prelim</span><span class="mono">${prelim}</span></div>` : "";
-  const semiRow = semi ? `<div class="kv"><span>Semi</span><span class="mono">${semi}</span></div>` : "";
-  const fieldRow = fieldSize ? `<div class="kv"><span>Létszám (${prettyRole(it.roleNorm)})</span><span class="mono">${fieldSize}</span></div>` : "";
-  const partnerRow = partner ? `<div class="kv"><span>Partner (döntő)</span><span>${partner}</span></div>` : "";
+  const semiRow   = semi   ? `<div class="kv"><span>Semi</span><span class="mono">${semi}</span></div>` : "";
+
+  const fieldRow = fieldSize
+    ? `<div class="kv"><span>Létszám (${prettyRole(it.roleNorm)})</span><span class="mono">${fieldSize}</span></div>`
+    : "";
+
+  const partnerRow = partner
+    ? `<div class="kv"><span>Partner (döntő)</span><span>${partner}</span></div>`
+    : "";
 
   return `
     <details class="result-card">
