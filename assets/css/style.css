@@ -1,6 +1,5 @@
 /* ================================
-   HFS COMMUNITY UI – style.css
-   + Globális oldalsáv
+   HFS COMMUNITY UI – VÉGLEGES
    ================================ */
 
 /* --- VÁLTOZÓK ÉS TÉMÁK --- */
@@ -26,9 +25,6 @@
   --event-card-border: #f0d0d0;
   --today-bg: #fff0f0;
 
-  --status-biztos-border: #2e7d32;
-  --status-talan-border: #ef6c00;
-
   --shadow: 0 4px 12px rgba(0,0,0,0.08);
 
   --radius-xl: 18px;
@@ -37,36 +33,24 @@
   --radius-sm: 10px;
 
   --gap: 14px;
-
-  /* sidebar */
   --sidebar-w: 280px;
 }
 
 [data-theme="dark"] {
   --bg-color: #0a0a0a;
   --card-bg: #1a1a1a;
-
   --text-color: #f0f0f0;
   --text-muted: #aaa;
-
   --border-color: #333;
   --nav-bg: #1e1e1e;
-
   --hfs-red: #ff4d4d;
   --hfs-light-red: #2d1a1a;
-
-  --empty-day-fill: #1a1a1a;
-  --empty-dots: #333333;
-
   --status-biztos-bg: #2a2a2a;
   --event-card-bg: #2d1a1a;
-  --event-card-border: #4a2a2a;
-  --today-bg: #3d1010;
-
   --shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 
-/* --- RESET / ALAPOK --- */
+/* --- ALAPOK (Gradiensmentesítve) --- */
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 
@@ -74,500 +58,195 @@ body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: var(--text-color);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
   background: var(--bg-color);
+  -webkit-font-smoothing: antialiased;
 }
 
-a{ color: inherit; text-decoration:none; }
-img{ max-width: 100%; display:block; }
-
-.muted{ color: var(--text-muted); }
-.tiny{ font-size: 12px; color: var(--text-muted); }
-.mono{ font-variant-numeric: tabular-nums; }
+a { color: inherit; text-decoration: none; }
 
 /* ================================
-   TOPBAR / NAV
-   ================================ */
-.topbar{
+   TOPBAR & NAVIGÁCIÓ
+   =============================== */
+.topbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 14px;
   padding: 14px 18px;
-  background: color-mix(in srgb, var(--nav-bg) 88%, transparent);
+  background: color-mix(in srgb, var(--nav-bg) 95%, transparent);
   border-bottom: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
 }
 
-.brand{
-  display:flex;
-  align-items:center;
+.brand {
+  display: flex;
+  align-items: center;
   gap: 10px;
   font-weight: 900;
-  letter-spacing: -0.2px;
 }
 
-.brand::before{
-  content:"";
-  width: 10px;
-  height: 10px;
+.brand::before {
+  content: "";
+  width: 10px; height: 10px;
   border-radius: 999px;
   background: var(--hfs-red);
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--hfs-red) 20%, transparent);
 }
 
-.nav{
-  display:flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items:center;
-}
+.nav { display: flex; gap: 8px; flex-wrap: wrap; }
 
-.nav a{
-  padding: 9px 12px;
+.nav a {
+  padding: 9px 16px;
   border-radius: 999px;
-  border: 1px solid transparent;
   color: var(--text-muted);
-  transition: 0.15s ease;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.nav a:hover{
+.nav a:hover {
   background: var(--hfs-light-red);
-  border-color: color-mix(in srgb, var(--hfs-red) 20%, var(--border-color));
-  color: var(--text-color);
+  color: var(--hfs-red);
 }
 
 .nav a.active {
-  background: var(--hfs-red); /* Gradiens helyett fix szín */
-  border-color: var(--hfs-red);
+  background: var(--hfs-red);
   color: #fff;
-  box-shadow: 0 10px 22px color-mix(in srgb, var(--hfs-red) 25%, transparent);
+  box-shadow: 0 8px 16px color-mix(in srgb, var(--hfs-red) 20%, transparent);
 }
 
 /* ================================
-   GLOBÁLIS OLDALSÁV LAYOUT
+   LAYOUT & SIDEBAR
    ================================ */
-
-.shell{
+.shell {
   max-width: 1320px;
   margin: 0 auto;
-  padding: 18px 18px 40px;
+  padding: 20px;
 }
 
-.layout{
-  display:grid;
+.layout {
+  display: grid;
   grid-template-columns: var(--sidebar-w) 1fr;
-  gap: 16px;
-  align-items:start;
+  gap: 20px;
+  align-items: start;
 }
 
-/* a régi .container most a main tartalom doboza lesz */
-.container{
-  max-width: none;
-  margin: 0;
-  padding: 0;
-}
-
-.sidebar{
+.sidebar {
   position: sticky;
-  top: 74px; /* topbar magasság környéke */
-  align-self: start;
-  border: 1px solid var(--border-color);
+  top: 80px;
   background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
   overflow: hidden;
 }
 
 .sidebar-head {
-  padding: 14px 14px 12px;
+  padding: 16px;
   border-bottom: 1px solid var(--border-color);
-  background: var(--card-bg); /* Gradiens törölve */
+  background: var(--card-bg);
 }
 
-.sidebar-title{
-  font-weight: 950;
-  letter-spacing: -0.2px;
-  margin: 0;
-}
+.sidebar-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
 
-.sidebar-sub{
-  margin: 6px 0 0;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.sidebar-body{
-  padding: 12px;
-  display:flex;
-  flex-direction:column;
-  gap: 10px;
-}
-
-.side-card{
-  border: 1px solid color-mix(in srgb, var(--hfs-red) 12%, var(--border-color));
-  background: color-mix(in srgb, var(--card-bg) 92%, var(--hfs-light-red));
-  border-radius: var(--radius-lg);
-  padding: 12px;
-}
-
-.side-card h3{
-  margin: 0 0 6px;
-  font-size: 12px;
-  letter-spacing: .35px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.side-card .big{
-  font-size: 16px;
-  font-weight: 950;
-  letter-spacing: -0.2px;
-}
-
-.side-nav{
-  display:flex;
-  flex-direction:column;
+/* ================================
+   ÚJ GOMB RENDSZER
+   ================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-}
-
-.side-link{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  border: 1px solid transparent;
-  color: var(--text-color);
-  transition: .15s ease;
-  background: transparent;
-}
-
-.side-link:hover{
-  background: var(--hfs-light-red);
-  border-color: color-mix(in srgb, var(--hfs-red) 18%, var(--border-color));
-}
-
-.side-link.active{
-  background: color-mix(in srgb, var(--hfs-red) 12%, var(--card-bg));
-  border-color: color-mix(in srgb, var(--hfs-red) 28%, var(--border-color));
-}
-
-.side-link .hint{
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-/* theme toggle */
-.theme-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap: 10px;
-}
-
-.switch{
-  position: relative;
-  width: 46px;
-  height: 28px;
-  background: color-mix(in srgb, var(--border-color) 65%, transparent);
+  padding: 10px 18px;
   border-radius: 999px;
   border: 1px solid var(--border-color);
-  cursor: pointer;
-  transition: .15s ease;
-}
-.switch::after{
-  content:"";
-  position:absolute;
-  top: 3px;
-  left: 3px;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
   background: var(--card-bg);
-  box-shadow: var(--shadow);
-  transition: .15s ease;
-}
-.switch[data-on="true"]{
-  background: color-mix(in srgb, var(--hfs-red) 25%, transparent);
-  border-color: color-mix(in srgb, var(--hfs-red) 35%, var(--border-color));
-}
-.switch[data-on="true"]::after{
-  transform: translateX(18px);
+  color: var(--text-color);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* mobil: sidebar fent, 1 oszlop */
-@media (max-width: 980px){
-  .layout{
-    grid-template-columns: 1fr;
-  }
-  .sidebar{
-    position: relative;
-    top: auto;
-  }
+.btn-primary {
+  background: var(--hfs-red);
+  color: #fff;
+  border-color: var(--hfs-red);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--hfs-red);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.btn-primary:hover {
+  background: var(--hfs-red-hover);
+  border-color: var(--hfs-red-hover);
 }
 
 /* ================================
-   PAGE HERO
+   KÁRTYÁK & EREDMÉNYEK
    ================================ */
 .page-hero {
-  border: 1px solid color-mix(in srgb, var(--hfs-red) 22%, var(--border-color));
-  background: var(--card-bg); /* Gradiens törölve */
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
-  padding: 18px 18px 14px;
-  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 20px;
 }
 
-/* ================================
-   BUTTON
-   ================================ */
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 999px;
+.result-card {
   border: 1px solid var(--border-color);
   background: var(--card-bg);
-  color: var(--text-color);
-  cursor: pointer;
-  transition: 0.15s ease;
-}
-
-.btn:hover{
-  border-color: color-mix(in srgb, var(--hfs-red) 25%, var(--border-color));
-  background: color-mix(in srgb, var(--hfs-light-red) 70%, var(--card-bg));
-}
-
-/* ================================
-   CARDS GRID (Résztvevők)
-   ================================ */
-.cards{
-  margin-top: 16px;
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--gap);
-}
-
-.card,
-.link-card{
-  border: 1px solid var(--border-color);
-  background: color-mix(in srgb, var(--card-bg) 92%, var(--hfs-light-red));
-  border-radius: var(--radius-xl);
-  padding: 16px;
-  box-shadow: var(--shadow);
-  transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
-}
-
-.link-card{ display:block; }
-
-.card:hover,
-.link-card:hover{
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--hfs-red) 35%, var(--border-color));
-  box-shadow: 0 10px 26px rgba(0,0,0,0.10);
-}
-
-.card h2{
-  margin: 0 0 6px;
-  font-size: 18px;
-  letter-spacing: -0.2px;
-}
-
-.card p{ margin:0; }
-
-/* badge alap */
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  border: 1px solid rgba(0,0,0,0.06);
-  background: var(--status-biztos-bg);
-}
-
-.badge::before{
-  content:"";
-  width: 8px; height: 8px;
-  border-radius: 999px;
-  background: var(--text-muted);
-  opacity: .8;
-}
-
-.badge.newcomer{
-  background: color-mix(in srgb, var(--hfs-light-red) 70%, var(--card-bg));
-  border-color: color-mix(in srgb, var(--hfs-red) 30%, var(--border-color));
-  color: var(--hfs-red);
-}
-.badge.novice{
-  background: #e8f3ff;
-  border-color: #b9d7ff;
-  color: #1e5aa8;
-}
-.badge.intermediate{
-  background: #fff7e6;
-  border-color: #ffe0a6;
-  color: #8a5a00;
-}
-.badge.advanced{
-  background: #efeaff;
-  border-color: #d7c8ff;
-  color: #4a2a9b;
-}
-.badge.allstar{
-  background: #e9fff3;
-  border-color: #bdf1d4;
-  color: #1f7a4b;
-}
-.badge.champion{
-  background: #111;
-  border-color: #222;
-  color: #fff;
-}
-
-/* Profil link */
-.profile-link{
-  display:inline-flex;
-  align-items:center;
-  gap: 8px;
-  padding: 9px 12px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--hfs-red) 16%, var(--border-color));
-  background: color-mix(in srgb, var(--hfs-light-red) 60%, var(--card-bg));
-  color: var(--text-color);
-  font-weight: 700;
-  transition: 0.15s ease;
-}
-.profile-link:hover{
-  background: color-mix(in srgb, var(--hfs-light-red) 85%, var(--card-bg));
-  border-color: color-mix(in srgb, var(--hfs-red) 26%, var(--border-color));
-}
-
-/* ================================
-   PROFIL HEADER
-   ================================ */
-.profile-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:12px;
-  margin-bottom: 16px;
-}
-
-/* ================================
-   RESULTS (Accordion cards)
-   ================================ */
-.block{ margin-top: 18px; }
-.block-title{ font-size: 20px; margin: 0 0 8px; }
-.role-block{ margin-top: 10px; }
-
-.result-list{ display:flex; flex-direction:column; gap:10px; }
-
-.result-card{
-  border:1px solid var(--border-color);
-  background: var(--card-bg);
-  border-radius: 16px;
-  overflow:hidden;
-  box-shadow: var(--shadow);
+  border-radius: var(--radius-lg);
+  margin-bottom: 12px;
+  overflow: hidden;
 }
 
 .result-summary {
-  list-style: none;
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  /* Gradiens helyett enyhe fix háttérszín */
-  background: color-mix(in srgb, var(--hfs-light-red) 40%, transparent);
+  padding: 16px;
+  background: color-mix(in srgb, var(--hfs-light-red) 30%, transparent);
+  cursor: pointer;
 }
 
-.result-card summary::-webkit-details-marker{ display:none; }
-
-details.result-card[open] .result-summary {
-  background: color-mix(in srgb, var(--hfs-light-red) 60%, transparent);
+.stat {
+  background: color-mix(in srgb, var(--card-bg) 95%, var(--hfs-red));
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  text-align: center;
 }
 
-.result-left{ min-width: 220px; }
-.result-date{ color: var(--text-muted); font-size: 12px; }
-.result-event{ font-size: 16px; font-weight: 900; margin-top: 4px; }
-
-.result-right{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-.result-col{
-  width: 90px;
-  text-align:right;
-}
-.result-label{ color: var(--text-muted); font-size: 12px; }
-.result-value{ font-size: 18px; font-weight: 950; }
-
-.result-body{
-  border-top: 1px solid var(--border-color);
-  padding: 12px 14px;
-}
-
-.result-body.event-body {
-  padding: 14px 16px;
-  background: var(--card-bg);
-}
-
-/* screenshot-szerű stat grid */
-.event-stats{
-  display:grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  align-items:stretch;
-}
-.event-stats.cols-3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.event-stats.cols-2{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.event-stats.cols-1{ grid-template-columns: 1fr; }
-
-.stat{
-  border: 1px solid color-mix(in srgb, var(--hfs-red) 14%, var(--border-color));
-  background: color-mix(in srgb, var(--card-bg) 92%, var(--hfs-light-red));
-  border-radius: 14px;
-  padding: 12px 12px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap: 6px;
-  min-height: 74px;
-}
-.stat .slabel{
-  font-size: 11px;
-  color: var(--text-muted);
-  letter-spacing: .35px;
-  text-transform: uppercase;
-}
-.stat .svalue{
-  font-weight: 950;
-  font-size: 26px;
-  letter-spacing: -0.4px;
+.stat .svalue {
+  display: block;
+  font-size: 28px;
+  font-weight: 900;
   color: var(--hfs-red);
-  line-height: 1.05;
-}
-.stat .svalue.small{ font-size: 22px; }
-.stat.partner .svalue{
-  font-size: 24px;
-  line-height: 1.1;
-  word-break: break-word;
 }
 
-@media (max-width: 820px){
-  .result-summary{ flex-direction:column; }
-  .result-right{ justify-content:flex-end; }
-  .result-col{ width:auto; text-align:left; }
-  .event-stats{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* ================================
+   RESZPONZÍV LOGIKA
+   ================================ */
+@media (max-width: 980px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: relative; top: 0; }
+  .sidebar-body { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .side-nav { grid-column: span 2; }
+}
+
+@media (max-width: 600px) {
+  .topbar { flex-direction: column; padding: 10px; }
+  .nav { width: 100%; }
+  .nav a { flex: 1; text-align: center; font-size: 12px; padding: 8px 4px; }
+  
+  .sidebar-body { grid-template-columns: 1fr; }
+  
+  .result-summary { flex-direction: column; gap: 10px; }
+  .event-stats { grid-template-columns: 1fr !important; }
+  
+  .stat { padding: 12px; }
 }
