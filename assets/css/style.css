@@ -216,16 +216,36 @@ a { color: inherit; text-decoration: none; }
 .stat {
   background: color-mix(in srgb, var(--card-bg) 95%, var(--hfs-red));
   border: 1px solid var(--border-color);
-  padding: 16px;
+  padding: 12px; /* Kicsit csökkentett belső margó */
   border-radius: var(--radius-md);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 90px;
+}
+
+.stat .slabel {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
 }
 
 .stat .svalue {
   display: block;
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 900;
   color: var(--hfs-red);
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+.stat.partner .svalue {
+  font-size: 16px; 
+  letter-spacing: -0.2px;
 }
 
 /* ================================
@@ -239,9 +259,13 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 600px) {
-  .topbar { flex-direction: column; padding: 10px; }
-  .nav { width: 100%; }
-  .nav a { flex: 1; text-align: center; font-size: 12px; padding: 8px 4px; }
+  .stat .svalue {
+    font-size: 20px;
+  }
+  .stat.partner .svalue {
+    font-size: 15px;
+  }
+}
   
   .sidebar-body { grid-template-columns: 1fr; }
   
