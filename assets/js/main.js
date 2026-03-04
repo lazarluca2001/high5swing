@@ -55,6 +55,9 @@ function safeText(v) {
   return (v ?? "").toString().trim();
 }
 
+/**
+ * Igaz, ha tényleges adat (nem üres és nem "-" / "—" stb.)
+ */
 function hasValue(v) {
   const s = safeText(v);
   if (!s) return false;
@@ -234,36 +237,73 @@ function prettyRole(roleNorm) {
 }
 
 function prettyDivision(divNorm, original) {
-  // A címben maradhat az eredeti felirat, de a sorrend norm alapján megy
   return safeText(original) || divNorm;
 }
 
+/**
+ * Egy item (event) – lenyitható kártya:
+ * summary: dátum + event + helyezés + pont
+ * open után: screenshot-szerű stat blokkok
+ * - Semi/Partner csak ha van adat
+ */
 function renderResultItem(it) {
   const date = safeText(it.date) || "—";
   const event = safeText(it.event) || "—";
 
   const finalPlace = hasValue(it.final) ? safeText(it.final) : "—";
-  const points = hasValue(it.points) ? safeText(it.points) : "—";
+  const points = hasValue(it.points) ? safeText(it.points) : "0";
 
   const prelim = hasValue(it.prelim) ? safeText(it.prelim) : "";
   const semi = hasValue(it.semi) ? safeText(it.semi) : "";
 
-  const fieldSize = hasValue(getRoleFieldSize(it.roleNorm, it.leaderCount, it.followerCount))
-    ? getRoleFieldSize(it.roleNorm, it.leaderCount, it.followerCount)
-    : "";
+  const fieldSizeRaw = getRoleFieldSize(it.roleNorm, it.leaderCount, it.followerCount);
+  const fieldSize = hasValue(fieldSizeRaw) ? safeText(fieldSizeRaw) : "";
 
   const partner = hasValue(it.partner) ? safeText(it.partner) : "";
 
-  const prelimRow = prelim ? `<div class="kv"><span>Prelim</span><span class="mono">${prelim}</span></div>` : "";
-  const semiRow   = semi   ? `<div class="kv"><span>Semi</span><span class="mono">${semi}</span></div>` : "";
+  const stats = [];
 
-  const fieldRow = fieldSize
-    ? `<div class="kv"><span>Létszám (${prettyRole(it.roleNorm)})</span><span class="mono">${fieldSize}</span></div>`
-    : "";
+  if (fieldSize) {
+    stats.push(`
+      <div class="stat">
+        <div class="slabel">Indulók</div>
+        <div class="svalue">${fieldSize}</div>
+      </div>
+    `);
+  }
 
-  const partnerRow = partner
-    ? `<div class="kv"><span>Partner (döntő)</span><span>${partner}</span></div>`
-    : "";
+  if (prelim) {
+    stats.push(`
+      <div class="stat">
+        <div class="slabel">Prelim</div>
+        <div class="svalue">${prelim}</div>
+      </div>
+    `);
+  }
+
+  if (semi) {
+    stats.push(`
+      <div class="stat">
+        <div class="slabel">Semi</div>
+        <div class="svalue">${semi}</div>
+      </div>
+    `);
+  }
+
+  if (partner) {
+    stats.push(`
+      <div class="stat partner">
+        <div class="slabel">Partner</div>
+        <div class="svalue small">${partner}</div>
+      </div>
+    `);
+  }
+
+  const colsClass =
+    stats.length === 4 ? "" :
+    stats.length === 3 ? "cols-3" :
+    stats.length === 2 ? "cols-2" :
+    "cols-1";
 
   return `
     <details class="result-card">
@@ -284,10 +324,10 @@ function renderResultItem(it) {
         </div>
       </summary>
 
-      <div class="result-body">
+      <div class="result-body event-body">
         ${
-          prelimRow || semiRow || fieldRow || partnerRow
-            ? `<div class="result-grid">${prelimRow}${semiRow}${fieldRow}${partnerRow}</div>`
+          stats.length
+            ? `<div class="event-stats ${colsClass}">${stats.join("")}</div>`
             : `<div class="muted tiny">Nincs további részlet.</div>`
         }
       </div>
@@ -353,6 +393,24 @@ function renderProfile(groups) {
     .join("");
 }
 
+/**
+ * Accordion: ha egy details nyílik, zárjuk a többieket
+ */
+function initAccordion(rootSelector = "#profileContent") {
+  const root = document.querySelector(rootSelector);
+  if (!root) return;
+
+  root.addEventListener("toggle", (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLDetailsElement)) return;
+    if (!t.open) return;
+
+    root.querySelectorAll("details.result-card[open]").forEach((d) => {
+      if (d !== t) d.open = false;
+    });
+  });
+}
+
 async function loadProfileFromSheet() {
   const nameParam = getParam("name");
   const name = safeText(nameParam);
@@ -390,7 +448,7 @@ async function loadProfileFromSheet() {
   const COL_POINT = 11;
   const COL_PARTNER = 18;
 
-  // groups: { [divisionOriginal]: { [roleNorm]: [items...] } }
+  // groups: { [divisionKey]: { [roleNorm]: [items...] } }
   const groups = {};
 
   for (let r = dataStart; r < rows.length; r++) {
@@ -436,6 +494,7 @@ async function loadProfileFromSheet() {
   }
 
   renderProfile(groups);
+  initAccordion("#profileContent");
 }
 
 /* =========================================================
