@@ -21,10 +21,10 @@
   </header>
 
   <div class="shell">
-    <div class="layout">
+    <div class="calendar-layout">
 
-      <!-- BAL OLDALI COMMUNITY SIDEBAR -->
-      <aside class="sidebar">
+      <!-- EGYETLEN KÖZÖS SIDEBAR -->
+      <aside class="sidebar calendar-unified-sidebar" id="calendarSidebar">
         <div class="sidebar-head">
           <div class="sidebar-title">HFS 2026</div>
           <div class="sidebar-sub">Community dashboard</div>
@@ -47,36 +47,21 @@
           </div>
 
           <div class="side-card">
-            <h3>Oldalról</h3>
-            <p class="muted">
-              Események, részvételi státuszok és közösségi aktivitás egy helyen.
-            </p>
-          </div>
-        </div>
-      </aside>
-
-      <!-- NAPTÁR TARTALMI RÉSZ -->
-      <div class="calendar-shell">
-
-        <!-- JOBB OLDALI / MOBILON LENYÍLÓ NAPTÁR SIDEBAR -->
-        <aside class="calendar-sidebar" id="calendarSidebar">
-
-          <div class="calendar-sidebar-card">
             <h3>Következő állomás</h3>
             <div id="nextEventContent" class="next-event-content">Betöltés...</div>
           </div>
 
-          <div class="calendar-sidebar-card">
+          <div class="side-card">
             <h3>Tagok szűrése</h3>
             <div id="memberFilter" class="member-filter"></div>
           </div>
 
-          <div class="calendar-sidebar-card">
+          <div class="side-card">
             <h3>Aktivitás 2026</h3>
             <div id="activityChart" class="activity-chart-container"></div>
           </div>
 
-          <div class="calendar-sidebar-card">
+          <div class="side-card">
             <h3>Megjelenés</h3>
             <select id="themeSelectorCalendar" class="month-select" style="width: 100%;">
               <option value="light">☀️ Világos</option>
@@ -84,59 +69,58 @@
               <option value="rainbow">🌈 Szivárvány</option>
             </select>
           </div>
-        </aside>
+        </div>
+      </aside>
 
-        <!-- FŐ NAPTÁR -->
-        <main class="calendar-section">
-          <section class="page-hero calendar-hero">
-            <div class="calendar-hero-top">
-              <div>
-                <h1>Naptár</h1>
-                <p class="muted">
-                  Eventek, részvételi státuszok és közösségi aktivitás 2026-ra.
-                </p>
-              </div>
+      <!-- FŐ TARTALOM -->
+      <main class="calendar-main">
+        <section class="page-hero calendar-hero">
+          <div class="calendar-hero-top">
+            <div>
+              <h1>Naptár</h1>
+              <p class="muted">Eventek, részvételi státuszok és közösségi aktivitás 2026-ra.</p>
+            </div>
 
-              <button id="sidebarToggle" class="btn calendar-filter-toggle" type="button">
-                Szűrők
+            <button id="sidebarToggle" class="btn calendar-filter-toggle" type="button">
+              Szűrők
+            </button>
+          </div>
+
+          <div class="month-display-container">
+            <div class="month-title-group">
+              <button
+                class="nav-btn"
+                type="button"
+                onclick="changeMonth(-1)"
+                aria-label="Előző hónap"
+              >
+                ❮
+              </button>
+
+              <h2 id="currentMonthHeader" class="month-display">JANUÁR</h2>
+
+              <button
+                class="nav-btn"
+                type="button"
+                onclick="changeMonth(1)"
+                aria-label="Következő hónap"
+              >
+                ❯
               </button>
             </div>
 
-            <div class="month-display-container">
-              <div class="month-title-group">
-                <button
-                  class="nav-btn"
-                  type="button"
-                  onclick="changeMonth(-1)"
-                  aria-label="Előző hónap"
-                >
-                  ❮
-                </button>
-
-                <h2 id="currentMonthHeader" class="month-display">JANUÁR</h2>
-
-                <button
-                  class="nav-btn"
-                  type="button"
-                  onclick="changeMonth(1)"
-                  aria-label="Következő hónap"
-                >
-                  ❯
-                </button>
-              </div>
-
-              <div class="controls-row">
-                <button class="today-btn" type="button" onclick="goToToday()">Ma</button>
-                <select id="monthSelect" class="month-select" aria-label="Hónap választása"></select>
-              </div>
+            <div class="controls-row">
+              <button class="today-btn" type="button" onclick="goToToday()">Ma</button>
+              <select id="monthSelect" class="month-select" aria-label="Hónap választása"></select>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <div id="calendar" class="calendar-grid"></div>
+        <div id="calendar" class="calendar-grid"></div>
 
-          <div class="calendar-footer-spacer"></div>
-        </main>
-      </div>
+        <div class="calendar-footer-spacer"></div>
+      </main>
+
     </div>
   </div>
 
