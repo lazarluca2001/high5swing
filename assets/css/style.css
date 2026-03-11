@@ -1,6 +1,7 @@
 /* ================================
    HFS COMMUNITY UI – TELJES CSS
    + Résztvevők: tag-kártyák divízió színekkel
+   + Naptár oldal
    ================================ */
 
 :root {
@@ -19,10 +20,19 @@
   --radius-md: 12px;
   --sidebar-w: 280px;
 
-  /* tag tokenek */
   --tag-radius: 14px;
   --tag-pad-y: 10px;
   --tag-pad-x: 12px;
+
+  /* calendar */
+  --empty-day-fill: #f9f9f9;
+  --empty-dots: #e0e0e0;
+  --status-biztos-bg: #ffffff;
+  --event-card-bg: #fff5f5;
+  --event-card-border: #f0d0d0;
+  --today-bg: #fff0f0;
+  --status-biztos-border: #2e7d32;
+  --status-talan-border: #ef6c00;
 }
 
 [data-theme="dark"] {
@@ -35,6 +45,13 @@
   --hfs-red: #ff4d4d;
   --hfs-light-red: #2d1a1a;
   --shadow: 0 4px 15px rgba(0,0,0,0.4);
+
+  --empty-day-fill: #1a1a1a;
+  --empty-dots: #333333;
+  --status-biztos-bg: #2a2a2a;
+  --event-card-bg: #2d1a1a;
+  --event-card-border: #4a2a2a;
+  --today-bg: #3d1010;
 }
 
 /* --- RESET & ALAPOK --- */
@@ -67,19 +84,33 @@ a { color: inherit; text-decoration: none; }
 
 .brand { font-weight: 900; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
 .brand::before {
-  content: ""; width: 10px; height: 10px; border-radius: 50%;
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
   background: var(--hfs-red);
   box-shadow: 0 0 0 5px color-mix(in srgb, var(--hfs-red) 20%, transparent);
 }
 
 .nav { display: flex; gap: 8px; }
 .nav a {
-  padding: 8px 16px; border-radius: 999px;
-  color: var(--text-muted); font-weight: 600; transition: 0.2s ease;
+  padding: 8px 16px;
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-weight: 600;
+  transition: 0.2s ease;
   border: 1px solid transparent;
 }
-.nav a.active { background: var(--hfs-red); color: #fff; border-color: var(--hfs-red); }
-.nav a:hover:not(.active) { background: var(--hfs-light-red); color: var(--hfs-red); border-color: color-mix(in srgb, var(--hfs-red) 18%, var(--border-color)); }
+.nav a.active {
+  background: var(--hfs-red);
+  color: #fff;
+  border-color: var(--hfs-red);
+}
+.nav a:hover:not(.active) {
+  background: var(--hfs-light-red);
+  color: var(--hfs-red);
+  border-color: color-mix(in srgb, var(--hfs-red) 18%, var(--border-color));
+}
 
 /* --- LAYOUT --- */
 .shell { max-width: 1320px; margin: 0 auto; padding: 20px; }
@@ -105,7 +136,8 @@ a { color: inherit; text-decoration: none; }
 
 .side-card {
   background: color-mix(in srgb, var(--card-bg) 95%, var(--hfs-red));
-  padding: 15px; border-radius: var(--radius-lg);
+  padding: 15px;
+  border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--hfs-red) 10%, var(--border-color));
 }
 
@@ -117,34 +149,70 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 10px;
 }
 
-/* sidebar nav */
 .side-nav { display: flex; flex-direction: column; gap: 6px; }
 .side-link {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 12px; border-radius: var(--radius-md); font-weight: 650; transition: 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-weight: 650;
+  transition: 0.2s;
   border: 1px solid transparent;
 }
-.side-link:hover { background: var(--hfs-light-red); color: var(--hfs-red); border-color: color-mix(in srgb, var(--hfs-red) 18%, var(--border-color)); }
-.side-link.active { background: var(--hfs-light-red); color: var(--hfs-red); border: 1px solid color-mix(in srgb, var(--hfs-red) 20%, transparent); }
-.side-link .hint { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.side-link:hover {
+  background: var(--hfs-light-red);
+  color: var(--hfs-red);
+  border-color: color-mix(in srgb, var(--hfs-red) 18%, var(--border-color));
+}
+.side-link.active {
+  background: var(--hfs-light-red);
+  color: var(--hfs-red);
+  border: 1px solid color-mix(in srgb, var(--hfs-red) 20%, transparent);
+}
+.side-link .hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
 
 /* --- TARTALOM ELEMEK --- */
 .page-hero {
-  background: var(--card-bg); padding: 24px; border-radius: var(--radius-xl);
-  border: 1px solid var(--border-color); box-shadow: var(--shadow); margin-bottom: 24px;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
 }
 
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
 
 .card {
-  background: var(--card-bg); padding: 20px; border-radius: var(--radius-xl);
-  border: 1px solid var(--border-color); box-shadow: var(--shadow); transition: 0.2s ease;
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  transition: 0.2s ease;
 }
-.card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--hfs-red) 35%, var(--border-color)); }
+.card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--hfs-red) 35%, var(--border-color));
+}
 
 .badge {
-  display: inline-flex; padding: 5px 12px; border-radius: 999px;
-  font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 8px 0;
+  display: inline-flex;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 8px 0;
   border: 1px solid rgba(0,0,0,0.06);
 }
 
@@ -157,35 +225,89 @@ a { color: inherit; text-decoration: none; }
 .badge.champion { background: #111; color: #fff; border-color: #222; }
 
 .profile-link {
-  display: inline-block; margin-top: 12px; font-weight: 800; color: var(--hfs-red);
+  display: inline-block;
+  margin-top: 12px;
+  font-weight: 800;
+  color: var(--hfs-red);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-color);
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.btn:hover {
+  border-color: color-mix(in srgb, var(--hfs-red) 28%, var(--border-color));
+  background: var(--hfs-light-red);
+  color: var(--hfs-red);
 }
 
 /* --- STATISZTIKÁK (LENYÍLÓ) --- */
-.result-card { border: 1px solid var(--border-color); background: var(--card-bg); border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden; }
-.result-summary { display: flex; justify-content: space-between; gap: 12px; padding: 16px; cursor: pointer; background: color-mix(in srgb, var(--hfs-light-red) 30%, transparent); }
-.event-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; padding: 16px; }
+.result-card {
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.result-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--hfs-light-red) 30%, transparent);
+}
+.result-left { min-width: 220px; }
+.result-date { font-size: 12px; color: var(--text-muted); }
+.result-event { margin-top: 4px; font-size: 16px; font-weight: 900; }
+.result-right { display: flex; gap: 14px; align-items: center; }
+.result-col { width: 90px; text-align: right; }
+.result-label { font-size: 12px; color: var(--text-muted); }
+.result-value { font-size: 18px; font-weight: 900; }
+
+.result-body { padding: 0; }
+.event-body { padding: 16px; }
+
+.event-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
 
 .stat {
   background: color-mix(in srgb, var(--card-bg) 97%, var(--hfs-red));
-  border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md); text-align: center;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  border-radius: var(--radius-md);
+  text-align: center;
 }
-.stat .slabel { font-size: 10px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; letter-spacing: .8px; }
-.stat .svalue { font-size: 18px; font-weight: 950; color: var(--hfs-red); }
+.stat .slabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  letter-spacing: .8px;
+}
+.stat .svalue {
+  font-size: 18px;
+  font-weight: 950;
+  color: var(--hfs-red);
+}
 .stat.partner .svalue { font-size: 14px; }
 
 /* =========================================================
-   ✅ RÉSZTVEVŐK – TAG KÁRTYÁK (filter chipek)
-   ---------------------------------------------------------
-   Használd bármelyik konténert:
-   - .member-selector   (korábbi)
-   - .tag-grid / .tag-list
-   és elemek:
-   - .member-card / .tag-card / .tag
-   és adj a tagre divízió osztályt:
-   .newcomer / .novice / .intermediate / .advanced / .allstar / .champion
+   RÉSZTVEVŐK – TAG KÁRTYÁK
    ========================================================= */
-
-/* konténer (több név kompatibilitás) */
 .member-selector,
 .tag-grid,
 .tag-list,
@@ -196,7 +318,6 @@ a { color: inherit; text-decoration: none; }
   margin-top: 12px;
 }
 
-/* tag alap (button/a/div mind jó) */
 .member-card,
 .tag-card,
 .tag {
@@ -204,24 +325,19 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-
   width: 100%;
   padding: var(--tag-pad-y) var(--tag-pad-x);
-
   border-radius: var(--tag-radius);
   border: 1px solid var(--border-color);
   background: color-mix(in srgb, var(--card-bg) 96%, transparent);
-
   font-weight: 800;
   letter-spacing: -0.2px;
   color: var(--text-color);
-
   cursor: pointer;
   user-select: none;
   transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease, background .14s ease;
 }
 
-/* hover */
 .member-card:hover,
 .tag-card:hover,
 .tag:hover {
@@ -229,7 +345,6 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 10px 18px rgba(0,0,0,0.08);
 }
 
-/* ikon (ha van emoji span) */
 .member-card .icon,
 .tag-card .icon,
 .tag .icon {
@@ -238,7 +353,6 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
 }
 
-/* active állapot – tedd rá JS-ben: .active vagy aria-pressed=true */
 .member-card.active,
 .tag-card.active,
 .tag.active,
@@ -249,96 +363,362 @@ a { color: inherit; text-decoration: none; }
   transform: translateY(-1px);
 }
 
-/* -------- Division színek: TAGOKRA -------- */
-/* Newcomer */
-.member-card.newcomer, .tag-card.newcomer, .tag.newcomer{
+.member-card.newcomer, .tag-card.newcomer, .tag.newcomer {
   border-color: color-mix(in srgb, var(--hfs-red) 28%, var(--border-color));
   background: color-mix(in srgb, var(--hfs-light-red) 85%, var(--card-bg));
   color: var(--hfs-red);
 }
-/* Novice */
-.member-card.novice, .tag-card.novice, .tag.novice{
+.member-card.novice, .tag-card.novice, .tag.novice {
   border-color: #b9d7ff;
   background: #e8f3ff;
   color: #1e5aa8;
 }
-/* Intermediate */
-.member-card.intermediate, .tag-card.intermediate, .tag.intermediate{
+.member-card.intermediate, .tag-card.intermediate, .tag.intermediate {
   border-color: #ffe0a6;
   background: #fff7e6;
   color: #8a5a00;
 }
-/* Advanced */
-.member-card.advanced, .tag-card.advanced, .tag.advanced{
+.member-card.advanced, .tag-card.advanced, .tag.advanced {
   border-color: #d7c8ff;
   background: #efeaff;
   color: #4a2a9b;
 }
-/* All Star */
-.member-card.allstar, .tag-card.allstar, .tag.allstar{
+.member-card.allstar, .tag-card.allstar, .tag.allstar {
   border-color: #bdf1d4;
   background: #e9fff3;
   color: #1f7a4b;
 }
-/* Champion */
-.member-card.champion, .tag-card.champion, .tag.champion{
+.member-card.champion, .tag-card.champion, .tag.champion {
   border-color: #222;
   background: #111;
   color: #fff;
 }
 
-/* active állapot divíziónként (erősebb) */
-.member-card.newcomer.active, .tag-card.newcomer.active, .tag.newcomer.active,
-.member-card.newcomer[aria-pressed="true"], .tag-card.newcomer[aria-pressed="true"], .tag.newcomer[aria-pressed="true"]{
-  background: color-mix(in srgb, var(--hfs-red) 16%, var(--card-bg));
-  border-color: color-mix(in srgb, var(--hfs-red) 55%, var(--border-color));
-}
-
-.member-card.novice.active, .tag-card.novice.active, .tag.novice.active,
-.member-card.novice[aria-pressed="true"], .tag-card.novice[aria-pressed="true"], .tag.novice[aria-pressed="true"]{
-  background: color-mix(in srgb, #b9d7ff 28%, #e8f3ff);
-  border-color: #7db3ff;
-}
-
-.member-card.intermediate.active, .tag-card.intermediate.active, .tag.intermediate.active,
-.member-card.intermediate[aria-pressed="true"], .tag-card.intermediate[aria-pressed="true"], .tag.intermediate[aria-pressed="true"]{
-  background: color-mix(in srgb, #ffe0a6 30%, #fff7e6);
-  border-color: #ffcc66;
-}
-
-.member-card.advanced.active, .tag-card.advanced.active, .tag.advanced.active,
-.member-card.advanced[aria-pressed="true"], .tag-card.advanced[aria-pressed="true"], .tag.advanced[aria-pressed="true"]{
-  background: color-mix(in srgb, #d7c8ff 30%, #efeaff);
-  border-color: #b39cff;
-}
-
-.member-card.allstar.active, .tag-card.allstar.active, .tag.allstar.active,
-.member-card.allstar[aria-pressed="true"], .tag-card.allstar[aria-pressed="true"], .tag.allstar[aria-pressed="true"]{
-  background: color-mix(in srgb, #bdf1d4 28%, #e9fff3);
-  border-color: #6fe0a4;
-}
-
-.member-card.champion.active, .tag-card.champion.active, .tag.champion.active,
-.member-card.champion[aria-pressed="true"], .tag-card.champion[aria-pressed="true"], .tag.champion[aria-pressed="true"]{
-  background: #000;
-  border-color: #555;
-}
-
-/* ---------------------------------------------------------
-   Dark mode finomhangolás a tagokra
-   --------------------------------------------------------- */
-[data-theme="dark"] .member-card,
-[data-theme="dark"] .tag-card,
-[data-theme="dark"] .tag{
-  border-color: color-mix(in srgb, var(--border-color) 90%, transparent);
-  background: color-mix(in srgb, var(--card-bg) 92%, transparent);
-}
-
 /* --- TÉMA KAPCSOLÓ --- */
-.switch { width: 44px; height: 24px; background: #ccc; border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s; }
-.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-.switch[data-on="true"] { background: var(--hfs-red); }
-.switch[data-on="true"]::after { transform: translateX(20px); }
+.switch {
+  width: 44px;
+  height: 24px;
+  background: #ccc;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.switch[data-on="true"] {
+  background: var(--hfs-red);
+}
+.switch[data-on="true"]::after {
+  transform: translateX(20px);
+}
+
+.theme-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+/* =========================================================
+   NAPTÁR OLDAL
+   ========================================================= */
+body.calendar-page {
+  overflow-y: auto !important;
+  height: auto;
+}
+
+.calendar-shell {
+  display: flex;
+  min-height: calc(100vh - 69px);
+  width: 100%;
+}
+
+.calendar-sidebar {
+  width: 320px;
+  min-width: 320px;
+  background: var(--card-bg);
+  padding: 24px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.calendar-sidebar-card {
+  background: var(--bg-color);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.calendar-sidebar-card h3 {
+  margin-bottom: 10px;
+  color: var(--hfs-red);
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+}
+
+.calendar-section {
+  flex: 1;
+  min-height: calc(100vh - 69px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-color);
+  overflow-x: auto;
+}
+
+.calendar-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.calendar-filter-toggle {
+  display: none;
+}
+
+.month-display-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.month-title-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+}
+
+.month-display {
+  color: var(--hfs-red);
+  font-size: 2.2em;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-btn,
+.today-btn {
+  background: var(--hfs-red);
+  color: white;
+  border: none;
+  border-radius: 999px;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 14px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.month-select {
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--border-color);
+  gap: 1px;
+  width: 100%;
+}
+
+.calendar-footer-spacer {
+  height: 120px;
+  width: 100%;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.weekday {
+  background: var(--hfs-red);
+  color: white;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8em;
+  text-transform: uppercase;
+}
+
+.day {
+  background: var(--card-bg);
+  padding: 10px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.day.today {
+  background: var(--today-bg) !important;
+  box-shadow: inset 0 0 0 2px var(--hfs-red);
+}
+
+.empty-day-pre,
+.empty-day-post {
+  background-color: var(--empty-day-fill);
+  background-image: radial-gradient(var(--empty-dots) 1px, transparent 0);
+  background-size: 10px 10px;
+}
+
+.day-number {
+  font-weight: 800;
+  color: var(--text-color);
+  opacity: 0.45;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+}
+
+.event-card {
+  background-color: var(--event-card-bg);
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--event-card-border);
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.event-title {
+  font-weight: 800;
+  color: var(--hfs-red);
+  font-size: 0.8em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.participants-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+}
+
+.person-tag {
+  background: var(--status-biztos-bg);
+  padding: 3px 8px;
+  border-radius: 15px;
+  font-size: 0.7em;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid #ccc;
+  color: var(--text-color);
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.status-biztos { border-left-color: var(--status-biztos-border); }
+.status-talan { border-left-color: var(--status-talan-border); }
+
+.member-filter {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.filter-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 8px 5px;
+  border-radius: 10px;
+  color: var(--text-color);
+  font-weight: 700;
+  font-size: 0.82em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.filter-btn:hover {
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  border-color: var(--hfs-red);
+  background: var(--hfs-light-red);
+  color: var(--hfs-red);
+}
+
+.activity-chart-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  height: auto !important;
+  padding: 15px;
+}
+
+.chart-column-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.chart-bar {
+  width: 14px;
+  background: var(--hfs-red);
+  border-radius: 0 0 5px 5px;
+  transition: height 0.6s ease-out;
+}
+
+.chart-label {
+  font-size: 10px;
+  font-weight: bold;
+  order: 3;
+  margin-top: 5px;
+}
+
+.chart-emoji {
+  order: 1;
+  font-size: 1.2em;
+}
+
+.next-event-title {
+  font-size: 1.15em;
+  font-weight: 800;
+  color: var(--text-color);
+  line-height: 1.2;
+}
+
+.next-event-countdown {
+  margin-top: 6px;
+  font-weight: 800;
+  color: var(--hfs-red);
+  font-size: 1em;
+}
 
 /* --- RESZPONZÍV --- */
 @media (max-width: 900px) {
@@ -348,12 +728,97 @@ a { color: inherit; text-decoration: none; }
   .side-card:nth-child(1){ grid-column: span 2; }
 }
 
-@media (max-width: 700px){
+@media (max-width: 700px) {
   .member-selector,
   .tag-grid,
   .tag-list,
-  .tags{
+  .tags {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .calendar-filter-toggle {
+    display: inline-flex;
+  }
+
+  .calendar-sidebar {
+    position: fixed;
+    top: 69px;
+    left: 0;
+    height: calc(100vh - 69px);
+    z-index: 1200;
+    transform: translateX(-100%);
+    width: 100% !important;
+    min-width: 100%;
+    background: var(--card-bg);
+    transition: transform 0.3s ease-in-out;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px;
+  }
+
+  .calendar-sidebar.open {
+    transform: translateX(0);
+  }
+
+  body.calendar-sidebar-open {
+    overflow: hidden;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, 120px);
+    width: max-content;
+    gap: 1px;
+    background: var(--border-color);
+  }
+
+  .weekday {
+    width: 120px;
+    min-width: 120px;
+    font-size: 0.75em;
+    height: 35px;
+  }
+
+  .day {
+    width: 120px;
+    min-width: 120px;
+    min-height: 140px;
+    padding: 6px;
+  }
+
+  .day-number {
+    font-size: 0.8em;
+    opacity: 0.6;
+  }
+
+  .event-card {
+    cursor: default;
+    padding: 5px;
+    margin-bottom: 5px;
+  }
+
+  .event-title {
+    font-size: 0.75em;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    white-space: normal;
+    overflow: visible;
+    font-weight: 800;
+  }
+
+  .event-card .participants-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 5px;
+  }
+
+  .person-tag {
+    font-size: 0.65em;
+    padding: 2px 4px;
+    width: 100%;
+    border-radius: 4px;
   }
 }
 
@@ -361,4 +826,32 @@ a { color: inherit; text-decoration: none; }
   .topbar { flex-direction: column; gap: 12px; }
   .sidebar-body { grid-template-columns: 1fr; }
   .event-stats { grid-template-columns: 1fr 1fr; }
+
+  .calendar-hero-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .month-title-group {
+    gap: 12px;
+  }
+
+  .month-display {
+    font-size: 1.6em;
+    text-align: center;
+  }
+
+  .controls-row {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .month-select,
+  .today-btn {
+    width: 100%;
+  }
+
+  .member-filter {
+    grid-template-columns: 1fr 1fr;
+  }
 }
