@@ -8,6 +8,10 @@ const PARTICIPANTS_CSV =
 const RESULTS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSDDBNbIkZize7hPMfYPovbLgnIFWNuseLg0mjzDYGhLCwEEiF_-CiXnV76lgg2mvb54QabZ8y3Sork/pub?gid=1410406652&single=true&output=csv";
 
+// 3) Naptár (CSV)
+const CALENDAR_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSDDBNbIkZize7hPMfYPovbLgnIFWNuseLg0mjzDYGhLCwEEiF_-CiXnV76lgg2mvb54QabZ8y3Sork/pub?gid=338581218&single=true&output=csv";
+
 /* ---------------------------
    Utils
 --------------------------- */
@@ -84,8 +88,11 @@ function divisionToClassParticipants(division) {
 
 function initTheme() {
   const saved = localStorage.getItem("theme");
-  if (saved === "dark") document.documentElement.dataset.theme = "dark";
-  else delete document.documentElement.dataset.theme;
+  if (saved === "dark") {
+    document.documentElement.dataset.theme = "dark";
+  } else {
+    document.documentElement.dataset.theme = "light";
+  }
 }
 
 function setTheme(mode) {
@@ -93,13 +100,13 @@ function setTheme(mode) {
     document.documentElement.dataset.theme = "dark";
     localStorage.setItem("theme", "dark");
   } else {
-    delete document.documentElement.dataset.theme;
+    document.documentElement.dataset.theme = "light";
     localStorage.setItem("theme", "light");
   }
 }
 
 /* ---------------------------
-   Sidebar inject (minden oldalon)
+   Sidebar inject (nem naptár oldalon)
 --------------------------- */
 
 function getCurrentPageKey() {
@@ -111,6 +118,7 @@ function getCurrentPageKey() {
 }
 
 function injectSidebarLayout() {
+  if (document.body.classList.contains("calendar-page")) return;
   if (document.querySelector(".layout") && document.querySelector(".sidebar")) return;
 
   const main = document.querySelector("main.container");
@@ -162,7 +170,6 @@ function injectSidebarLayout() {
     </div>
   `;
 
-  // layout: sidebar + main
   const parent = main.parentNode;
   const marker = document.createComment("layout-marker");
   parent.insertBefore(marker, main);
@@ -174,7 +181,6 @@ function injectSidebarLayout() {
   parent.insertBefore(shell, marker);
   parent.removeChild(marker);
 
-  // hook theme switch
   const sw = document.getElementById("themeSwitch");
   if (sw) {
     const isDark = document.documentElement.dataset.theme === "dark";
@@ -241,11 +247,9 @@ async function loadParticipantsFromSheet() {
 
   const rows = parseCSV(text);
 
-  // 4. sor header, 5-10 adatok
   const dataStart = 4;
   const dataEnd = 9;
 
-  // B,C,D
   const COL_NAME = 1;
   const COL_DIV = 2;
   const COL_WSDC = 3;
@@ -396,12 +400,6 @@ function renderResultItem(it) {
     `);
   }
 
-  const colsClass =
-    stats.length === 4 ? "" :
-    stats.length === 3 ? "cols-3" :
-    stats.length === 2 ? "cols-2" :
-    "cols-1";
-
   return `
     <details class="result-card">
       <summary class="result-summary">
@@ -424,8 +422,8 @@ function renderResultItem(it) {
       <div class="result-body event-body">
         ${
           stats.length
-            ? `<div class="event-stats ${colsClass}">${stats.join("")}</div>`
-            : `<div class="muted tiny">Nincs további részlet.</div>`
+            ? `<div class="event-stats">${stats.join("")}</div>`
+            : `<div class="card"><p class="tiny">Nincs további részlet.</p></div>`
         }
       </div>
     </details>
@@ -488,7 +486,6 @@ function renderProfile(groups) {
     .join("");
 }
 
-/* accordion: csak 1 legyen nyitva */
 function initAccordion(rootSelector = "#profileContent") {
   const root = document.querySelector(rootSelector);
   if (!root) return;
@@ -526,8 +523,6 @@ async function loadProfileFromSheet() {
 
   const dataStart = 4;
 
-  // B=1 Name, C=2 Division, D=3 Event, E=4 Date, F=5 Role, G=6 Leader, H=7 Follower,
-  // I=8 Prelim, J=9 Semi, K=10 Final, L=11 Point, S=18 Partner
   const COL_NAME = 1;
   const COL_DIV = 2;
   const COL_EVENT = 3;
@@ -577,7 +572,6 @@ async function loadProfileFromSheet() {
     groups[divisionKey][roleNorm].push(item);
   }
 
-  // legfrissebb elöl
   for (const div of Object.keys(groups)) {
     for (const role of Object.keys(groups[div])) {
       groups[div][role].sort((a, b) => b._sort - a._sort);
@@ -588,13 +582,274 @@ async function loadProfileFromSheet() {
   initAccordion("#profileContent");
 }
 
+/* =========================================================
+   Naptár
+   ========================================================= */
+
+const CAL_CONFIG = {
+  members: {
+    "Csongi": "🌈",
+    "Merci": "🦆",
+    "Mózes": "🦄",
+    "Luca": "🐶",
+    "Zoli": "🕺"
+  },
+  validStatuses: ["igen", "talán", "talan", "fizetve", "igazolt"],
+  months: ["JANUÁR","FEBRUÁR","MÁRCIUS","ÁPRILIS","MÁJUS","JÚNIUS","JÚLIUS","AUGUSZTUS","SZEPTEMBER","OKTÓBER","NOVEMBER","DECEMBER"],
+  weekdays: ["H","K","Sze","Cs","P","Szo","V"]
+};
+
+let allEvents = [];
+let activeFilter = null;
+let currentMonthIdx = new Date().getMonth();
+
+function parseCalendarDate(d) {
+  if (!d) return null;
+  const clean = d.toString().trim().replace(/\.$/, "");
+  if (!clean) return null;
+
+  if (clean.includes("-")) {
+    const dt = new Date(clean);
+    return Number.isNaN(dt.getTime()) ? null : dt.setHours(0, 0, 0, 0);
+  }
+
+  const parts = clean.split(".");
+  if (parts.length === 3) {
+    const year = Number(parts[0]);
+    const month = Number(parts[1]) - 1;
+    const day = Number(parts[2]);
+    const dt = new Date(year, month, day);
+    return Number.isNaN(dt.getTime()) ? null : dt.setHours(0, 0, 0, 0);
+  }
+
+  return null;
+}
+
+async function initCalendarPage() {
+  if (!document.getElementById("calendar")) return;
+
+  try {
+    const res = await fetch(CALENDAR_CSV, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Calendar CSV fetch failed: ${res.status}`);
+    const csv = await res.text();
+    const rows = parseCSV(csv);
+
+    const headerIndex = rows.findIndex((r) => r.includes("Event"));
+    if (headerIndex === -1) throw new Error("Calendar header not found");
+
+    const headers = rows[headerIndex];
+
+    allEvents = rows.slice(headerIndex + 1)
+      .filter((r) => safeText(r[headers.indexOf("Event")]))
+      .map((row) => {
+        const obj = {};
+        headers.forEach((h, i) => { obj[h] = row[i]; });
+        obj._startTs = parseCalendarDate(row[headers.indexOf("Start date")]);
+        obj._endTs = parseCalendarDate(row[headers.indexOf("End date")]) || obj._startTs;
+        return obj;
+      })
+      .filter((e) => e._startTs);
+
+    setupCalendarSidebarToggle();
+    updateCalendarUI();
+  } catch (e) {
+    console.error("Naptár adatbetöltési hiba:", e);
+    const nextBox = document.getElementById("nextEventContent");
+    if (nextBox) nextBox.textContent = "Hiba a betöltésnél.";
+  }
+}
+
+function updateCalendarUI() {
+  renderCalendar(currentMonthIdx);
+  setupMonthSelect();
+  renderMemberFilter();
+  updateActivityChart();
+  updateNextCountdown();
+}
+
+function renderCalendar(monthIndex) {
+  const cal = document.getElementById("calendar");
+  if (!cal) return;
+
+  cal.innerHTML = "";
+  const fragment = document.createDocumentFragment();
+
+  const monthHeader = document.getElementById("currentMonthHeader");
+  if (monthHeader) monthHeader.innerText = CAL_CONFIG.months[monthIndex];
+
+  CAL_CONFIG.weekdays.forEach((d) => {
+    const div = document.createElement("div");
+    div.className = "weekday";
+    div.textContent = d;
+    fragment.appendChild(div);
+  });
+
+  const firstDay = (new Date(2026, monthIndex, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(2026, monthIndex + 1, 0).getDate();
+  const todayTs = new Date().setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < firstDay; i++) {
+    const div = document.createElement("div");
+    div.className = "day empty-day-pre";
+    fragment.appendChild(div);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const currTs = new Date(2026, monthIndex, d).setHours(0, 0, 0, 0);
+    const dayEvents = allEvents.filter((e) => currTs >= e._startTs && currTs <= e._endTs);
+
+    const dayDiv = document.createElement("div");
+    dayDiv.className = `day ${todayTs === currTs ? "today" : ""}`;
+    dayDiv.innerHTML = `<span class="day-number">${d}</span>`;
+
+    dayEvents.forEach((e) => {
+      let tagsHtml = "";
+
+      Object.entries(CAL_CONFIG.members).forEach(([name, emoji]) => {
+        const status = safeText(e[name]).toLowerCase();
+        if (CAL_CONFIG.validStatuses.some((vs) => status.includes(vs))) {
+          if (!activeFilter || activeFilter === name) {
+            const isTalan = status.includes("talan") || status.includes("talán");
+            tagsHtml += `<div class="person-tag ${isTalan ? "status-talan" : "status-biztos"}"><span>${emoji}</span><span>${name}</span></div>`;
+          }
+        }
+      });
+
+      if (tagsHtml || !activeFilter) {
+        const card = document.createElement("div");
+        card.className = "event-card";
+        card.innerHTML = `
+          <span class="event-title">${safeText(e.Event)}</span>
+          <div class="participants-container">${tagsHtml}</div>
+        `;
+        dayDiv.appendChild(card);
+      }
+    });
+
+    fragment.appendChild(dayDiv);
+  }
+
+  cal.appendChild(fragment);
+}
+
+function setupMonthSelect() {
+  const sel = document.getElementById("monthSelect");
+  if (!sel) return;
+
+  sel.innerHTML = CAL_CONFIG.months
+    .map((m, i) => `<option value="${i}" ${i === currentMonthIdx ? "selected" : ""}>${m}</option>`)
+    .join("");
+
+  sel.onchange = (e) => {
+    currentMonthIdx = parseInt(e.target.value, 10);
+    renderCalendar(currentMonthIdx);
+  };
+}
+
+window.changeMonth = (delta) => {
+  currentMonthIdx = (currentMonthIdx + delta + 12) % 12;
+  renderCalendar(currentMonthIdx);
+
+  const sel = document.getElementById("monthSelect");
+  if (sel) sel.value = currentMonthIdx;
+};
+
+window.goToToday = () => {
+  currentMonthIdx = new Date().getMonth();
+  renderCalendar(currentMonthIdx);
+
+  const sel = document.getElementById("monthSelect");
+  if (sel) sel.value = currentMonthIdx;
+};
+
+function renderMemberFilter() {
+  const box = document.getElementById("memberFilter");
+  if (!box) return;
+
+  box.innerHTML = Object.entries(CAL_CONFIG.members)
+    .map(([name, emoji]) => `
+      <button class="filter-btn ${activeFilter === name ? "active" : ""}" type="button" data-member="${name}">
+        <span>${emoji}</span> ${name}
+      </button>
+    `)
+    .join("");
+
+  box.querySelectorAll(".filter-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const name = btn.dataset.member;
+      activeFilter = activeFilter === name ? null : name;
+      updateCalendarUI();
+    });
+  });
+}
+
+function updateActivityChart() {
+  const container = document.getElementById("activityChart");
+  if (!container) return;
+
+  container.innerHTML = Object.entries(CAL_CONFIG.members)
+    .map(([name, emoji]) => {
+      const count = allEvents.filter((e) => {
+        const s = safeText(e[name]).toLowerCase();
+        return CAL_CONFIG.validStatuses.some((vs) => s.includes(vs));
+      }).length;
+
+      const height = Math.min(80, (count / 20) * 80);
+
+      return `
+        <div class="chart-column-wrapper">
+          <div class="chart-bar" style="height:${height}px"></div>
+          <span class="chart-label">${count}</span>
+          <span class="chart-emoji">${emoji}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function updateNextCountdown() {
+  const box = document.getElementById("nextEventContent");
+  if (!box) return;
+
+  const now = new Date().setHours(0, 0, 0, 0);
+  const next = allEvents
+    .filter((e) => e._endTs >= now)
+    .sort((a, b) => a._startTs - b._startTs)[0];
+
+  if (!next) {
+    box.innerHTML = `<div class="muted">Nincs közelgő esemény.</div>`;
+    return;
+  }
+
+  const diff = Math.round((next._startTs - now) / 86400000);
+
+  box.innerHTML = `
+    <div class="next-event-title">${safeText(next.Event)}</div>
+    <div class="next-event-countdown">${diff > 0 ? `Még ${diff} nap` : "Ma kezdődik! 🔥"}</div>
+  `;
+}
+
+function setupCalendarSidebarToggle() {
+  const btn = document.getElementById("sidebarToggle");
+  const sidebar = document.getElementById("calendarSidebar");
+  if (!btn || !sidebar) return;
+
+  btn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    document.body.classList.toggle("calendar-sidebar-open", sidebar.classList.contains("open"));
+  });
+}
+
 /* ---------------------------
    INIT
 --------------------------- */
 
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
-  injectSidebarLayout();
+
+  if (!document.body.classList.contains("calendar-page")) {
+    injectSidebarLayout();
+  }
 
   const participantsRoot = document.getElementById("participants");
   const profileRoot = document.getElementById("profileContent");
@@ -612,4 +867,8 @@ document.addEventListener("DOMContentLoaded", () => {
       profileRoot.innerHTML = `<div class="card"><h2>Hiba a betöltésnél</h2><p>${safeText(err.message)}</p></div>`;
     });
   }
+
+  initCalendarPage().catch((err) => {
+    console.error(err);
+  });
 });
