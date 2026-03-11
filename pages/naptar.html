@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body class="calendar-page">
+
   <header class="topbar">
     <div class="brand">High Five Swing</div>
     <nav class="nav">
@@ -18,19 +19,15 @@
 
   <div class="calendar-shell">
     <aside class="calendar-sidebar" id="calendarSidebar">
+      
       <div class="calendar-sidebar-card">
         <h3>Következő állomás</h3>
-        <div id="nextEventContent">Betöltés...</div>
+        <div id="nextEventContent" class="next-event-content">Betöltés...</div>
       </div>
 
       <div class="calendar-sidebar-card">
         <h3>Tagok szűrése</h3>
         <div id="memberFilter" class="member-filter"></div>
-      </div>
-
-      <div class="calendar-sidebar-card">
-        <h3>Aktivitás 2026</h3>
-        <div id="activityChart" class="activity-chart-container"></div>
       </div>
 
       <div class="calendar-sidebar-card">
@@ -40,6 +37,11 @@
           <option value="dark">🌙 Sötét</option>
           <option value="rainbow">🌈 Szivárvány</option>
         </select>
+      </div>
+
+      <div class="calendar-sidebar-card">
+        <h3>Aktivitás 2026</h3>
+        <div id="activityChart" class="activity-chart-container"></div>
       </div>
     </aside>
 
@@ -58,19 +60,20 @@
 
         <div class="month-display-container">
           <div class="month-title-group">
-            <button class="nav-btn" type="button" onclick="changeMonth(-1)">❮</button>
+            <button class="nav-btn" type="button" onclick="changeMonth(-1)" aria-label="Előző hónap">❮</button>
             <h2 id="currentMonthHeader" class="month-display">JANUÁR</h2>
-            <button class="nav-btn" type="button" onclick="changeMonth(1)">❯</button>
+            <button class="nav-btn" type="button" onclick="changeMonth(1)" aria-label="Következő hónap">❯</button>
           </div>
 
           <div class="controls-row">
             <button class="today-btn" type="button" onclick="goToToday()">Ma</button>
-            <select id="monthSelect" class="month-select"></select>
+            <select id="monthSelect" class="month-select" aria-label="Hónap választása"></select>
           </div>
         </div>
       </section>
 
       <div id="calendar" class="calendar-grid"></div>
+      
       <div class="calendar-footer-spacer"></div>
     </main>
   </div>
