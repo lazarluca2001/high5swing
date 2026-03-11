@@ -6,13 +6,21 @@ export const CSV_URLS = {
 
 export const CAL_CONFIG = {
     members: {
-        "Csongi": "🌈", "Merci": "🦆", "Mózes": "🦄", 
-        "Luca": "🐶", "Zoli": "🕺", "Viki": "🦦"
+        "Csongi": "🌈",
+        "Merci": "🦆",
+        "Mózes": "🦄",
+        "Luca": "🐶",
+        "Zoli": "🕺",
+        "Viki": "🦦"
     },
-    validStatuses: ["igen", "talán", "talan", "fizetve", "igazolt"],
-    months: ["JANUÁR", "FEBRUÁR", "MÁRCIUS", "ÁPRILIS", "MÁJUS", "JÚNIUS", "JÚLIUS", "AUGUSZTUS", "SZEPTEMBER", "OKTÓBER", "NOVEMBER", "DECEMBER"],
-    weekdays: ["H", "K", "Sze", "Cs", "P", "Szo", "V"]
-};
 
-export const ROLE_ORDER = ["leader", "follower"];
-export const DIVISION_ORDER = ["champion", "allstar", "advanced", "intermediate", "novice", "newcomer"];
+    validStatuses: ["igen", "talán", "talan", "fizetve", "igazolt"],
+
+    months: [
+        "JANUÁR","FEBRUÁR","MÁRCIUS","ÁPRILIS",
+        "MÁJUS","JÚNIUS","JÚLIUS","AUGUSZTUS",
+        "SZEPTEMBER","OKTÓBER","NOVEMBER","DECEMBER"
+    ],
+
+    weekdays: ["H","K","Sze","Cs","P","Szo","V"]
+};
