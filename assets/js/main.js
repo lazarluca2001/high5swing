@@ -30,15 +30,18 @@ function parseCSV(text) {
       i++;
       continue;
     }
+
     if (char === '"') {
       inQuotes = !inQuotes;
       continue;
     }
+
     if (char === "," && !inQuotes) {
       row.push(cell);
       cell = "";
       continue;
     }
+
     if ((char === "\n" || char === "\r") && !inQuotes) {
       if (char === "\r" && next === "\n") i++;
       row.push(cell);
@@ -47,6 +50,7 @@ function parseCSV(text) {
       cell = "";
       continue;
     }
+
     cell += char;
   }
 
@@ -54,6 +58,7 @@ function parseCSV(text) {
     row.push(cell);
     rows.push(row);
   }
+
   return rows;
 }
 
@@ -104,20 +109,17 @@ function parseCalendarDate(dateStr) {
   const s = safeText(dateStr);
   if (!s) return null;
 
-  // ISO vagy böngésző által értelmezhető dátum
   const parsed = Date.parse(s);
   if (!Number.isNaN(parsed)) {
     const d = new Date(parsed);
     return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   }
 
-  // yyyy.mm.dd / yyyy-mm-dd / yyyy/mm/dd
   let m = s.match(/^(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})$/);
   if (m) {
     return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).setHours(0, 0, 0, 0);
   }
 
-  // dd.mm.yyyy / dd-mm-yyyy / dd/mm/yyyy
   m = s.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})$/);
   if (m) {
     return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])).setHours(0, 0, 0, 0);
@@ -165,7 +167,7 @@ function normDivision(div) {
 }
 
 /* ---------------------------
-   Theme Management (Light, Dark, Rainbow)
+   Theme Management
 --------------------------- */
 
 function setTheme(mode) {
@@ -195,6 +197,28 @@ function getCurrentPageKey() {
   return "kezdo";
 }
 
+function getSidebarLinks() {
+  const isRootIndex =
+    /\/index\.html$/i.test(location.pathname) ||
+    location.pathname === "/" ||
+    location.pathname.endsWith("/high5swing/") ||
+    location.pathname.endsWith("/high5swing");
+
+  if (isRootIndex) {
+    return {
+      home: "./index.html",
+      calendar: "./pages/naptar.html",
+      participants: "./pages/resztvevok.html"
+    };
+  }
+
+  return {
+    home: "../index.html",
+    calendar: "./naptar.html",
+    participants: "./resztvevok.html"
+  };
+}
+
 function injectSidebarLayout() {
   if (document.body.classList.contains("calendar-page")) return;
   if (document.querySelector(".layout") && document.querySelector(".sidebar")) return;
@@ -203,6 +227,8 @@ function injectSidebarLayout() {
   if (!main) return;
 
   const pageKey = getCurrentPageKey();
+  const links = getSidebarLinks();
+
   const shell = document.createElement("div");
   shell.className = "shell";
 
@@ -221,11 +247,18 @@ function injectSidebarLayout() {
       <div class="side-card">
         <h3>Navigáció</h3>
         <div class="side-nav">
-          <a class="side-link ${pageKey === "kezdo" ? "active" : ""}" href="../index.html"><span>🏠 Kezdőlap</span></a>
-          <a class="side-link ${pageKey === "naptar" ? "active" : ""}" href="./naptar.html"><span>🗓️ Naptár</span></a>
-          <a class="side-link ${pageKey === "resztvevok" ? "active" : ""}" href="./resztvevok.html"><span>👥 Résztvevők</span></a>
+          <a class="side-link ${pageKey === "kezdo" ? "active" : ""}" href="${links.home}">
+            <span>🏠 Kezdőlap</span>
+          </a>
+          <a class="side-link ${pageKey === "naptar" ? "active" : ""}" href="${links.calendar}">
+            <span>🗓️ Naptár</span>
+          </a>
+          <a class="side-link ${pageKey === "resztvevok" ? "active" : ""}" href="${links.participants}">
+            <span>👥 Résztvevők</span>
+          </a>
         </div>
       </div>
+
       <div class="side-card">
         <h3>Megjelenés</h3>
         <select id="themeSelector" class="month-select" style="width: 100%; margin-top: 5px;">
@@ -258,7 +291,7 @@ function setupCalendarThemeSelector() {
 }
 
 /* =========================================================
-   Résztvevők (resztvevok.html)
+   Résztvevők
    ========================================================= */
 
 function renderParticipants(list) {
@@ -270,31 +303,29 @@ function renderParticipants(list) {
     return;
   }
 
-  root.innerHTML = list
-    .map((p) => {
-      const name = safeText(p.name) || "—";
-      const division = safeText(p.division) || "—";
-      const wsdcId = safeText(p.wsdcId);
-      const divClass = divisionToClassParticipants(division);
-      const wsdcHtml = wsdcId
-        ? `<a href="https://scoring.dance/huHU/wsdc/registry/${encodeURIComponent(wsdcId)}.html" target="_blank" rel="noopener noreferrer">${wsdcId}</a>`
-        : "—";
-      const profileUrl = `./profil.html?name=${encodeURIComponent(name)}`;
+  root.innerHTML = list.map((p) => {
+    const name = safeText(p.name) || "—";
+    const division = safeText(p.division) || "—";
+    const wsdcId = safeText(p.wsdcId);
+    const divClass = divisionToClassParticipants(division);
+    const wsdcHtml = wsdcId
+      ? `<a href="https://scoring.dance/huHU/wsdc/registry/${encodeURIComponent(wsdcId)}.html" target="_blank" rel="noopener noreferrer">${wsdcId}</a>`
+      : "—";
+    const profileUrl = `./profil.html?name=${encodeURIComponent(name)}`;
 
-      return `
-        <div class="card">
-          <h2>${name}</h2>
-          <p><span class="tiny"><strong>WSDC:</strong> ${wsdcHtml}</span></p>
-          <p style="margin-top:10px;">
-            <span class="badge ${divClass}">${division}</span>
-          </p>
-          <p style="margin-top:12px;">
-            <a class="profile-link" href="${profileUrl}">Profil megnyitása →</a>
-          </p>
-        </div>
-      `;
-    })
-    .join("");
+    return `
+      <div class="card">
+        <h2>${name}</h2>
+        <p><span class="tiny"><strong>WSDC:</strong> ${wsdcHtml}</span></p>
+        <p style="margin-top:10px;">
+          <span class="badge ${divClass}">${division}</span>
+        </p>
+        <p style="margin-top:12px;">
+          <a class="profile-link" href="${profileUrl}">Profil megnyitása →</a>
+        </p>
+      </div>
+    `;
+  }).join("");
 }
 
 async function loadParticipantsFromSheet() {
@@ -329,7 +360,7 @@ async function loadParticipantsFromSheet() {
 }
 
 /* =========================================================
-   Profil + eredmények (profil.html)
+   Profil + eredmények
    ========================================================= */
 
 const ROLE_ORDER = ["leader", "follower"];
