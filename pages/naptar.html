@@ -2,11 +2,11 @@
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Naptár – High Five Swing</title>
   <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
-<body>
+<body class="calendar-page">
   <header class="topbar">
     <div class="brand">High Five Swing</div>
     <nav class="nav">
@@ -16,10 +16,55 @@
     </nav>
   </header>
 
-  <main class="container">
-    <h1>Naptár</h1>
-    <p>Itt lehet majd eseménylista vagy Google Naptár beágyazás.</p>
-  </main>
+  <div class="calendar-shell">
+    <aside class="calendar-sidebar" id="calendarSidebar">
+      <div class="calendar-sidebar-card">
+        <h3>Következő állomás</h3>
+        <div id="nextEventContent">Betöltés...</div>
+      </div>
+
+      <div class="calendar-sidebar-card">
+        <h3>Tagok szűrése</h3>
+        <div id="memberFilter" class="member-filter"></div>
+      </div>
+
+      <div class="calendar-sidebar-card">
+        <h3>Aktivitás 2026</h3>
+        <div id="activityChart" class="activity-chart-container"></div>
+      </div>
+    </aside>
+
+    <main class="calendar-section">
+      <section class="page-hero calendar-hero">
+        <div class="calendar-hero-top">
+          <div>
+            <h1>Naptár</h1>
+            <p class="muted">Eventek, részvételi státuszok és közösségi aktivitás 2026-ra.</p>
+          </div>
+
+          <button id="sidebarToggle" class="btn calendar-filter-toggle" type="button">
+            Szűrők
+          </button>
+        </div>
+
+        <div class="month-display-container">
+          <div class="month-title-group">
+            <button class="nav-btn" type="button" onclick="changeMonth(-1)">❮</button>
+            <h2 id="currentMonthHeader" class="month-display">JANUÁR</h2>
+            <button class="nav-btn" type="button" onclick="changeMonth(1)">❯</button>
+          </div>
+
+          <div class="controls-row">
+            <button class="today-btn" type="button" onclick="goToToday()">Ma</button>
+            <select id="monthSelect" class="month-select"></select>
+          </div>
+        </div>
+      </section>
+
+      <div id="calendar" class="calendar-grid"></div>
+      <div class="calendar-footer-spacer"></div>
+    </main>
+  </div>
 
   <script src="../assets/js/main.js"></script>
 </body>
