@@ -57,26 +57,29 @@
 }
 
 [data-theme="rainbow"] {
-  /* --- SZIVÁRVÁNY MÓD --- */
-  --bg-color: #fdf2f8; 
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --text-color: #2d3436;
-  --text-muted: #636e72;
-  --border-color: #f0e1ff;
-  --nav-bg: #ffffff;
-  --hfs-red: #6c5ce7; /* Vibráló lila/indigo alap */
-  --hfs-red-hover: #a29bfe;
-  --hfs-light-red: #f3f0ff;
-  --shadow: 0 8px 20px rgba(255, 0, 150, 0.1);
+  /* Alapszínek: mélyebb, de vibráló sötétkék/lila alap, hogy a neon színek "üssenek" */
+  --bg-color: #050015; 
+  --card-bg: rgba(255, 255, 255, 0.07); /* Glassmorphism alap */
+  --text-color: #ffffff;
+  --text-muted: #d1d1d1;
+  --border-color: rgba(255, 255, 255, 0.2);
+  --nav-bg: rgba(10, 0, 30, 0.8);
+  
+  /* Neon Akcentusok */
+  --hfs-red: #ff00ff; /* Neon Magenta */
+  --hfs-red-hover: #00ffff; /* Neon Cián */
+  --hfs-light-red: rgba(255, 0, 255, 0.1);
+  --shadow: 0 0 20px rgba(255, 0, 255, 0.4), 0 0 40px rgba(0, 255, 255, 0.2);
 
-  --empty-day-fill: #fff9f0;
-  --empty-dots: #fab1a0;
-  --status-biztos-bg: #ffffff;
-  --event-card-bg: #f0f7ff;
-  --event-card-border: #74b9ff;
-  --today-bg: #e3fcef;
-  --status-biztos-border: #00b894;
-  --status-talan-border: #fdcb6e;
+  /* Naptár: extrém színek */
+  --empty-day-fill: rgba(255, 255, 255, 0.03);
+  --empty-dots: #444;
+  --status-biztos-bg: rgba(0, 255, 150, 0.1);
+  --event-card-bg: rgba(255, 255, 255, 0.05);
+  --event-card-border: rgba(255, 255, 255, 0.3);
+  --today-bg: rgba(255, 255, 255, 0.15);
+  --status-biztos-border: #00ff96;
+  --status-talan-border: #ffff00;
 }
 
 /* --- RESET & ALAPOK --- */
