@@ -537,7 +537,6 @@ async function initCalendarPage() {
     }
 
     const headers = rows[headerIndex].map(h => safeText(h));
-
     const eventIdx = headers.indexOf("Event");
     const startIdx = headers.indexOf("Start date");
     const endIdx = headers.indexOf("End date");
@@ -557,7 +556,6 @@ async function initCalendarPage() {
 
         obj._startTs = parseCalendarDate(row[startIdx]);
         obj._endTs = parseCalendarDate(row[endIdx]) || obj._startTs;
-
         return obj;
       })
       .filter(e => e._startTs);
