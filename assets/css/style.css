@@ -5,7 +5,6 @@
    ========================================================= */
 
 :root {
-  /* --- VILÁGOS MÓD (Default) --- */
   --hfs-red: #800000;
   --hfs-red-hover: #a00000;
   --hfs-light-red: #fff0f0;
@@ -14,7 +13,7 @@
   --text-color: #333333;
   --text-muted: #666666;
   --border-color: #dddddd;
-  --nav-bg: rgba(255, 255, 255, 0.9);
+  --nav-bg: rgba(255, 255, 255, 0.92);
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   --radius-xl: 18px;
   --radius-lg: 14px;
@@ -25,7 +24,6 @@
   --tag-pad-y: 10px;
   --tag-pad-x: 12px;
 
-  /* calendar */
   --empty-day-fill: #f9f9f9;
   --empty-dots: #e0e0e0;
   --status-biztos-bg: #ffffff;
@@ -37,15 +35,14 @@
 }
 
 [data-theme="dark"] {
-  /* --- SÖTÉT MÓD --- */
   --bg-color: #0a0a0a;
   --card-bg: #1a1a1a;
   --text-color: #f0f0f0;
   --text-muted: #aaaaaa;
   --border-color: #333333;
-  --nav-bg: rgba(30, 30, 30, 0.88);
+  --nav-bg: rgba(30, 30, 30, 0.9);
   --hfs-red: #ff4d4d;
-  --hfs-red-hover: #ff8080;
+  --hfs-red-hover: #ff7a7a;
   --hfs-light-red: #2d1a1a;
   --shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 
@@ -60,7 +57,6 @@
 }
 
 [data-theme="rainbow"] {
-  /* Klasszikus rainbow + jobb kontraszt */
   --bg-color:
     radial-gradient(circle at 20% 20%, rgba(154, 77, 255, 0.16), transparent 35%),
     radial-gradient(circle at 80% 15%, rgba(59, 164, 255, 0.14), transparent 35%),
@@ -71,17 +67,15 @@
   --text-color: #ffffff;
   --text-muted: #d6d2eb;
   --border-color: rgba(255, 255, 255, 0.2);
-  --nav-bg: rgba(18, 8, 42, 0.82);
+  --nav-bg: rgba(18, 8, 42, 0.86);
 
-  /* klasszikus rainbow skála */
   --rainbow-red: #ff4b4b;
   --rainbow-orange: #ff9a1f;
   --rainbow-yellow: #ffd93d;
   --rainbow-green: #35d07f;
-  --rainbow-blue: #3b82f6;
+  --rainbow-blue: #3ba4ff;
   --rainbow-purple: #9a4dff;
 
-  /* UI akcentus */
   --hfs-red: var(--rainbow-orange);
   --hfs-red-hover: var(--rainbow-yellow);
   --hfs-light-red: rgba(255, 154, 31, 0.14);
@@ -116,6 +110,8 @@ body {
 
 a { color: inherit; text-decoration: none; }
 
+.muted { color: var(--text-muted); }
+
 /* --- TOPBAR --- */
 .topbar {
   position: sticky;
@@ -138,7 +134,7 @@ a { color: inherit; text-decoration: none; }
       rgba(255, 154, 31, 0.18),
       rgba(255, 217, 61, 0.15),
       rgba(53, 208, 127, 0.14),
-      rgba(59, 130, 246, 0.14),
+      rgba(59, 164, 255, 0.14),
       rgba(154, 77, 255, 0.16)
     ),
     color-mix(in srgb, var(--nav-bg) 92%, transparent);
@@ -198,10 +194,25 @@ a { color: inherit; text-decoration: none; }
   border-color: color-mix(in srgb, var(--hfs-red) 18%, var(--border-color));
 }
 
-/* --- LAYOUT --- */
-.shell { max-width: 1320px; margin: 0 auto; padding: 20px; }
-.layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; gap: 24px; align-items: start; }
-.container { max-width: none; margin: 0; padding: 0; }
+/* --- ALAP LAYOUT --- */
+.shell {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.container {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
 
 /* --- SIDEBAR --- */
 .sidebar {
@@ -220,8 +231,16 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1px solid var(--border-color);
 }
 
-.sidebar-title { font-weight: 900; font-size: 1.1rem; }
-.sidebar-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.sidebar-title {
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+.sidebar-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
 
 .sidebar-body {
   padding: 12px;
@@ -246,7 +265,11 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 10px;
 }
 
-.side-nav { display: flex; flex-direction: column; gap: 6px; }
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
 .side-link {
   display: flex;
@@ -271,13 +294,7 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid color-mix(in srgb, var(--hfs-red) 20%, transparent);
 }
 
-.side-link .hint {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-/* --- TARTALOM ELEMEK --- */
+/* --- TARTALMI ELEMEK --- */
 .page-hero {
   background: var(--card-bg);
   padding: 24px;
@@ -336,7 +353,6 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-/* division badge-ek */
 .badge.newcomer { background: var(--hfs-light-red); color: var(--hfs-red); border-color: color-mix(in srgb, var(--hfs-red) 22%, var(--border-color)); }
 .badge.novice { background: #e8f3ff; color: #1e5aa8; border-color: #b9d7ff; }
 .badge.intermediate { background: #fff7e6; color: #8a5a00; border-color: #ffe0a6; }
@@ -372,7 +388,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--hfs-red);
 }
 
-/* --- STATISZTIKÁK (LENYÍLÓ) --- */
+/* --- PROFIL / RESULT --- */
 .result-card {
   border: 1px solid var(--border-color);
   background: var(--card-bg);
@@ -430,154 +446,29 @@ a { color: inherit; text-decoration: none; }
   color: var(--hfs-red);
 }
 
-.stat.partner .svalue { font-size: 14px; }
-
-/* =========================================================
-   RÉSZTVEVŐK – TAG KÁRTYÁK
-   ========================================================= */
-.member-selector,
-.tag-grid,
-.tag-list,
-.tags {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 12px;
+.stat.partner .svalue {
+  font-size: 14px;
 }
 
-.member-card,
-.tag-card,
-.tag {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: var(--tag-pad-y) var(--tag-pad-x);
-  border-radius: var(--tag-radius);
-  border: 1px solid var(--border-color);
-  background: color-mix(in srgb, var(--card-bg) 96%, transparent);
-  font-weight: 800;
-  letter-spacing: -0.2px;
-  color: var(--text-color);
-  cursor: pointer;
-  user-select: none;
-  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease, background .14s ease;
-}
-
-.member-card:hover,
-.tag-card:hover,
-.tag:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.08);
-}
-
-.member-card .icon,
-.tag-card .icon,
-.tag .icon {
-  width: 20px;
-  display: inline-flex;
-  justify-content: center;
-}
-
-.member-card.active,
-.tag-card.active,
-.tag.active,
-.member-card[aria-pressed="true"],
-.tag-card[aria-pressed="true"],
-.tag[aria-pressed="true"] {
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
-  transform: translateY(-1px);
-}
-
-.member-card.newcomer, .tag-card.newcomer, .tag.newcomer {
-  border-color: color-mix(in srgb, var(--hfs-red) 28%, var(--border-color));
-  background: color-mix(in srgb, var(--hfs-light-red) 85%, var(--card-bg));
-  color: var(--hfs-red);
-}
-.member-card.novice, .tag-card.novice, .tag.novice {
-  border-color: #b9d7ff;
-  background: #e8f3ff;
-  color: #1e5aa8;
-}
-.member-card.intermediate, .tag-card.intermediate, .tag.intermediate {
-  border-color: #ffe0a6;
-  background: #fff7e6;
-  color: #8a5a00;
-}
-.member-card.advanced, .tag-card.advanced, .tag.advanced {
-  border-color: #d7c8ff;
-  background: #efeaff;
-  color: #4a2a9b;
-}
-.member-card.allstar, .tag-card.allstar, .tag.allstar {
-  border-color: #bdf1d4;
-  background: #e9fff3;
-  color: #1f7a4b;
-}
-.member-card.champion, .tag-card.champion, .tag.champion {
-  border-color: #222;
-  background: #111;
-  color: #fff;
-}
-
-/* --- TÉMA KAPCSOLÓ --- */
-.theme-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-/* =========================================================
-   NAPTÁR OLDAL
-   ========================================================= */
+/* --- NAPTÁR OLDAL --- */
 body.calendar-page {
   overflow-y: auto !important;
   height: auto;
 }
 
-.calendar-shell {
-  display: flex;
-  min-height: calc(100vh - 69px);
+.calendar-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.calendar-unified-sidebar {
   width: 100%;
 }
 
-.calendar-sidebar {
-  width: 320px;
-  min-width: 320px;
-  background: var(--card-bg);
-  padding: 24px;
-  border-right: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.calendar-sidebar-card {
-  background: color-mix(in srgb, var(--card-bg) 96%, transparent);
-  border-radius: 14px;
-  padding: 16px;
-  border: 1px solid var(--border-color);
-}
-
-.calendar-sidebar-card h3 {
-  margin-bottom: 10px;
-  color: var(--hfs-red);
-  font-size: 0.9em;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
-
-.calendar-section {
-  flex: 1;
-  min-height: calc(100vh - 69px);
-  display: flex;
-  flex-direction: column;
-  background: transparent;
-  overflow-x: auto;
+.calendar-main {
+  min-width: 0;
 }
 
 .calendar-hero-top {
@@ -838,49 +729,35 @@ body.calendar-page {
   font-size: 1em;
 }
 
-.muted {
-  color: var(--text-muted);
-}
-
 /* --- RESZPONZÍV --- */
-@media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; margin-bottom: 20px; }
-  .sidebar-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .side-card:nth-child(1) { grid-column: span 2; }
-}
-
-@media (max-width: 700px) {
-  .member-selector,
-  .tag-grid,
-  .tag-list,
-  .tags {
+@media (max-width: 1024px) {
+  .layout,
+  .calendar-layout {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 1024px) {
+  .sidebar {
+    position: static;
+  }
+
   .calendar-filter-toggle {
     display: inline-flex;
   }
 
-  .calendar-sidebar {
+  .calendar-unified-sidebar {
     position: fixed;
     top: 69px;
     left: 0;
+    width: 100%;
     height: calc(100vh - 69px);
     z-index: 1200;
     transform: translateX(-100%);
-    width: 100% !important;
-    min-width: 100%;
-    background: var(--card-bg);
     transition: transform 0.3s ease-in-out;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 20px;
+    padding-bottom: 24px;
   }
 
-  .calendar-sidebar.open {
+  .calendar-unified-sidebar.open {
     transform: translateX(0);
   }
 
@@ -891,8 +768,6 @@ body.calendar-page {
   .calendar-grid {
     grid-template-columns: repeat(7, 120px);
     width: max-content;
-    gap: 1px;
-    background: var(--border-color);
   }
 
   .weekday {
@@ -944,10 +819,37 @@ body.calendar-page {
   }
 }
 
+@media (max-width: 900px) {
+  .sidebar-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .side-card:first-child {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 700px) {
+  .member-filter {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 600px) {
-  .topbar { flex-direction: column; gap: 12px; }
-  .sidebar-body { grid-template-columns: 1fr; }
-  .event-stats { grid-template-columns: 1fr 1fr; }
+  .topbar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sidebar-body {
+    grid-template-columns: 1fr;
+  }
+
+  .event-stats {
+    grid-template-columns: 1fr 1fr;
+  }
 
   .calendar-hero-top {
     flex-direction: column;
@@ -971,9 +873,5 @@ body.calendar-page {
   .month-select,
   .today-btn {
     width: 100%;
-  }
-
-  .member-filter {
-    grid-template-columns: 1fr 1fr;
   }
 }
