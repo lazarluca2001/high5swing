@@ -2,11 +2,6 @@ import { setTheme, injectSidebarLayout } from './ui.js';
 import { loadParticipantsFromSheet, loadProfileFromSheet } from './participants.js';
 import { initCalendarPage } from './calendar.js';
 
-/**
- * HFS COMMUNITY JS – BELÉPÉSI PONT (2026)
- * Ez a fájl koordinálja a modulok futtatását az oldal típusa alapján.
- */
-
 document.addEventListener("DOMContentLoaded", () => {
     console.log("High Five Swing - App Initializing... 🚀");
 
