@@ -2,7 +2,6 @@ import { CSV_URLS } from "./config.js";
 import { parseCSV, safeText } from "./utils.js";
 
 export async function loadParticipantsFromSheet() {
-
     const root = document.getElementById("participants");
     if (!root) return;
 
