@@ -25,7 +25,6 @@ export function injectSidebarLayout() {
         </div>
 
         <div class="sidebar-body">
-
             <div class="side-card">
                 <h3>Navigáció</h3>
                 <div class="side-nav">
@@ -43,20 +42,16 @@ export function injectSidebarLayout() {
                     <option value="rainbow">🌈 Szivárvány</option>
                 </select>
             </div>
-
         </div>
     `;
 
     const parent = main.parentNode;
-
     parent.insertBefore(shell, main);
     shell.appendChild(layout);
-
     layout.appendChild(sidebar);
     layout.appendChild(main);
 
     const selector = document.getElementById("themeSelector");
-
     if (selector) {
         selector.value = localStorage.getItem("theme") || "light";
         selector.addEventListener("change", e => setTheme(e.target.value));
