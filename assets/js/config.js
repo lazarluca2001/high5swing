@@ -17,10 +17,10 @@ export const CAL_CONFIG = {
     validStatuses: ["igen", "talán", "talan", "fizetve", "igazolt"],
 
     months: [
-        "JANUÁR","FEBRUÁR","MÁRCIUS","ÁPRILIS",
-        "MÁJUS","JÚNIUS","JÚLIUS","AUGUSZTUS",
-        "SZEPTEMBER","OKTÓBER","NOVEMBER","DECEMBER"
+        "JANUÁR", "FEBRUÁR", "MÁRCIUS", "ÁPRILIS",
+        "MÁJUS", "JÚNIUS", "JÚLIUS", "AUGUSZTUS",
+        "SZEPTEMBER", "OKTÓBER", "NOVEMBER", "DECEMBER"
     ],
 
-    weekdays: ["H","K","Sze","Cs","P","Szo","V"]
+    weekdays: ["H", "K", "Sze", "Cs", "P", "Szo", "V"]
 };
