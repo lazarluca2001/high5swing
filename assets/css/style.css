@@ -264,6 +264,15 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 10px;
 }
 
+[data-theme="rainbow"] .side-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+[data-theme="rainbow"] .side-card h3 {
+  color: #e9e4ff;
+}
+
 .side-nav {
   display: flex;
   flex-direction: column;
@@ -532,6 +541,23 @@ body.calendar-page {
   backdrop-filter: blur(10px);
 }
 
+[data-theme="rainbow"] .month-select {
+  background: rgba(22, 14, 46, 0.95);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+[data-theme="rainbow"] .month-select:focus {
+  outline: none;
+  border-color: var(--rainbow-yellow);
+  box-shadow: 0 0 0 3px rgba(255, 217, 61, 0.16);
+}
+
+[data-theme="rainbow"] .month-select option {
+  background: #1b1234;
+  color: #ffffff;
+}
+
 .calendar-scroll {
   width: 100%;
   overflow-x: auto;
@@ -689,11 +715,14 @@ body.calendar-page {
 
 .activity-chart-container {
   display: flex;
-  justify-content: space-around;
   align-items: flex-end;
+  justify-content: flex-start;
   gap: 10px;
-  min-height: 160px;
+  min-height: 170px;
   padding: 15px 8px 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
 }
 
 .chart-column-wrapper {
@@ -701,8 +730,10 @@ body.calendar-page {
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 5px;
-  min-width: 34px;
+  gap: 4px;
+  flex: 0 0 44px;
+  min-width: 44px;
+  max-width: 44px;
 }
 
 .chart-bar {
@@ -714,21 +745,27 @@ body.calendar-page {
 }
 
 .chart-label {
-  font-size: 10px;
-  font-weight: bold;
-  order: 3;
-  margin-top: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 44px;
+  min-height: 22px;
 }
 
 .chart-emoji {
   order: 1;
-  font-size: 1.2em;
+  font-size: 1.05em;
+  line-height: 1;
 }
 
 .chart-value {
   font-size: 10px;
   font-weight: 800;
   color: var(--text-muted);
+  line-height: 1;
 }
 
 .next-event-title {
