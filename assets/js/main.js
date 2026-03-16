@@ -1,16 +1,14 @@
-import { setTheme, injectSidebarLayout } from './ui.js';
+import { setTheme, initGlobalSidebar } from './ui.js';
 import { loadParticipantsFromSheet, loadProfileFromSheet } from './participants.js';
 import { initCalendarPage } from './calendar.js';
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     console.log("High Five Swing - App Initializing... 🚀");
 
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
 
-    if (!document.body.classList.contains("calendar-page")) {
-        injectSidebarLayout();
-    }
+    await initGlobalSidebar();
 
     if (document.getElementById("participants")) {
         loadParticipantsFromSheet().catch(err => {
