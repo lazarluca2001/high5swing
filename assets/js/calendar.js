@@ -247,13 +247,13 @@ function renderActivityChart() {
     const max = Math.max(...counts.map(c => c.count), 1);
 
     box.innerHTML = counts.map(({ name, emoji, count }) => {
-        const height = Math.max(6, Math.round((count / max) * 90));
+        const height = Math.max(10, Math.round((count / max) * 120));
         return `
             <div class="chart-column-wrapper" title="${name}: ${count} esemény">
                 <div class="chart-value">${count}</div>
                 <div class="chart-bar" style="height:${height}px;"></div>
-                <div class="chart-emoji">${emoji}</div>
                 <div class="chart-label">${name}</div>
+                <div class="chart-emoji">${emoji}</div>
             </div>
         `;
     }).join("");
