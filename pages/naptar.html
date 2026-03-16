@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body class="calendar-page">
-
   <header class="topbar">
     <div class="brand">High Five Swing</div>
     <nav class="nav">
@@ -23,7 +22,6 @@
   <div class="shell">
     <div class="calendar-layout">
 
-      <!-- EGYETLEN KÖZÖS SIDEBAR -->
       <aside class="sidebar calendar-unified-sidebar" id="calendarSidebar">
         <div class="sidebar-head">
           <div class="sidebar-title">HFS 2026</div>
@@ -72,7 +70,6 @@
         </div>
       </aside>
 
-      <!-- FŐ TARTALOM -->
       <main class="calendar-main">
         <section class="page-hero calendar-hero">
           <div class="calendar-hero-top">
@@ -116,11 +113,12 @@
           </div>
         </section>
 
-        <div id="calendar" class="calendar-grid"></div>
+        <div class="calendar-scroll">
+          <div id="calendar" class="calendar-grid"></div>
+        </div>
 
         <div class="calendar-footer-spacer"></div>
       </main>
-
     </div>
   </div>
 
