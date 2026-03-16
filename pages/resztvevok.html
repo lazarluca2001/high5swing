@@ -16,24 +16,49 @@
     </nav>
   </header>
 
-  <main class="container">
-    <section class="page-hero">
-      <h1>Résztvevők</h1>
-      <p class="muted">Közösségünk aktív táncosai Google Sheets adatok alapján.</p>
-
-      <!-- opcionális: tag-kártyák / szűrő (ha később JS-sel kötöd rá) -->
-      <div class="block" style="margin-top:14px;">
-        <div class="tiny muted" style="margin-bottom:8px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;">
-          Tagok szűrése
+  <div class="shell">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <div class="sidebar-title">HFS 2026</div>
         </div>
-        <div class="member-selector" id="memberSelector">
+
+        <div class="sidebar-body">
+
+          <div class="side-card">
+            <h3>Következő állomás</h3>
+            <div id="nextEventContent" class="next-event-content">Betöltés...</div>
+          </div>
+
+          <div class="side-card">
+            <h3>Megjelenés</h3>
+            <select id="themeSelector" class="month-select" style="width: 100%;">
+              <option value="light">☀️ Világos</option>
+              <option value="dark">🌙 Sötét</option>
+              <option value="rainbow">🌈 Szivárvány</option>
+            </select>
+          </div>
         </div>
-      </div>
-    </section>
+      </aside>
 
-    <div id="participants" class="cards"></div>
-  </main>
+      <main class="container">
+        <section class="page-hero">
+          <h1>Résztvevők</h1>
+          <p class="muted">Közösségünk aktív táncosai Google Sheets adatok alapján.</p>
 
-  <script type="module" src="../js/main.js"></script>
+          <div class="block" style="margin-top:14px;">
+            <div class="tiny muted" style="margin-bottom:8px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;">
+              Tagok szűrése
+            </div>
+            <div class="member-selector" id="memberSelector"></div>
+          </div>
+        </section>
+
+        <div id="participants" class="cards"></div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/main.js"></script>
 </body>
 </html>
