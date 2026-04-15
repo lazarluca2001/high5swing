@@ -258,41 +258,64 @@ function renderEvents(results, container) {
 
     Object.keys(grouped).forEach(div => {
 
-        html += `
-            <div class="division-block">
-                <div class="division-header">${div}</div>
-                <div class="event-list">
-        `;
+        html += `<div class="division-block">`;
+        html += `<div class="division-header">${div}</div>`;
+        html += `<div class="event-list">`;
 
         grouped[div].forEach((r, i) => {
+
+            const id = `${div}-${i}`;
+
+            const badgeClass =
+                r.final === "1" ? "gold" :
+                r.final === "2" ? "silver" :
+                r.final === "3" ? "bronze" : "";
+
             html += `
-                <div class="event-item">
-                    <div class="event-main">
+                <div class="event-card" onclick="toggleEvent('${id}')">
+
+                    <div class="event-top">
                         <div class="event-title">${r.event}</div>
-                        <div class="event-partner">👤 ${r.partner || "—"}</div>
+
+                        <div class="event-badges">
+                            ${r.final ? `<span class="res-badge ${badgeClass}">${r.final}</span>` : ""}
+                            <span class="points-badge">+${r.point}</span>
+                        </div>
                     </div>
-                    <div class="event-points ${r.point > 0 ? 'positive' : ''}">
-                        +${r.point}
+
+                    <div class="event-expand" id="exp-${id}">
+                        <div class="event-details">
+                            <div><b>Partner:</b> ${r.partner || "—"}</div>
+                            <div><b>Prelim:</b> ${r.prelim || "-"}</div>
+                            <div><b>Semi:</b> ${r.semi || "-"}</div>
+                        </div>
                     </div>
+
                 </div>
             `;
         });
 
-        html += `
-                </div>
-            </div>
-        `;
+        html += `</div></div>`;
     });
 
     container.innerHTML = html;
 }
-/* ========================= */
-window.toggleAccordion = (id) => {
-    const el = document.getElementById(`acc-${id}`);
-    if (el) el.style.display = el.style.display === "none" ? "block" : "none";
-};
 
-window.setRole = (role) => {
-    activeRole = role;
-    loadProfileFromSheet();
+let openEventId = null;
+
+window.toggleEvent = (id) => {
+
+    // előző bezárása
+    if (openEventId && openEventId !== id) {
+        const prev = document.getElementById(`exp-${openEventId}`);
+        if (prev) prev.classList.remove("open");
+    }
+
+    const el = document.getElementById(`exp-${id}`);
+    if (!el) return;
+
+    const isOpen = el.classList.contains("open");
+
+    el.classList.toggle("open", !isOpen);
+    openEventId = isOpen ? null : id;
 };
