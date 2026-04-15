@@ -5,6 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Profil – High Five Swing</title>
   <link rel="stylesheet" href="../assets/css/style.css" />
+  <style>
+    /* Profil specifikus stílusok */
+    .profile-hero {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 40px 20px;
+      border-radius: var(--radius-xl);
+      text-align: center;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      background: var(--hfs-red);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 0 8px color-mix(in srgb, var(--hfs-red) 15%, transparent);
+    }
+
+    /* Versenyeredmények listája */
+    .results-section h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 800;
+    }
+
+    .results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .result-item {
+      background: var(--card-bg);
+      padding: 16px 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease;
+    }
+
+    .result-item:hover {
+      transform: translateX(4px);
+      border-color: var(--hfs-red);
+    }
+
+    .result-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .result-event {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text-color);
+    }
+
+    .result-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .result-place {
+      background: var(--hfs-red);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 0.9rem;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    #profileLoading {
+      text-align: center;
+      padding: 60px;
+      font-weight: 700;
+      color: var(--hfs-red);
+    }
+  </style>
 </head>
 <body class="profile-page">
   <header class="topbar">
@@ -16,44 +112,59 @@
     </nav>
   </header>
 
-  <main class="shell">
-    <div class="profile-actions" style="margin-bottom: 20px;">
-      <a class="side-link" href="./resztvevok.html" style="display: inline-flex; width: auto; gap: 8px; align-items: center;">
-        <span>←</span> Vissza a résztvevőkhöz
-      </a>
+  <div class="shell">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <div class="sidebar-title">HFS 2026</div>
+          <div class="sidebar-sub">Profil megtekintése</div>
+        </div>
+
+        <div class="sidebar-body">
+          <div class="side-card">
+            <h3>Navigáció</h3>
+            <a class="side-link" href="./resztvevok.html" style="margin-top: 8px;">
+              ← Vissza a listához
+            </a>
+          </div>
+
+          <div class="side-card">
+            <h3>Megjelenés</h3>
+            <select id="themeSelector" class="month-select theme-select" style="width: 100%;">
+              <option value="light">☀️ Világos</option>
+              <option value="dark">🌙 Sötét</option>
+              <option value="rainbow">🌈 Szivárvány</option>
+            </select>
+          </div>
+        </div>
+      </aside>
+
+      <main class="container">
+        <div id="profileLoading" class="card">
+           <div class="sidebar-title">Adatok lekérése a Sheets-ből...</div>
+        </div>
+
+        <div id="profileContainer" style="display: none;">
+          <section class="profile-hero">
+            <div class="profile-avatar" id="profileInitials">?</div>
+            <h1 id="profileName"></h1>
+            <p class="muted" id="profileDivision"></p>
+            
+            <div class="wsdc-row" style="justify-content: center; margin-top: 15px; display: flex; align-items: center; gap: 10px;">
+              <span id="profileWsdc"></span>
+              <a id="profileScoringLink" href="#" target="_blank" class="wsdc-link" title="Scoring profil">➔</a>
+            </div>
+          </section>
+
+          <section class="results-section">
+            <h3>Versenyeredmények</h3>
+            <div id="profileContent" class="results-list">
+              </div>
+          </section>
+        </div>
+      </main>
     </div>
-
-    <div id="profileLoading" class="card">
-       <div class="sidebar-title">Adatok lekérése...</div>
-    </div>
-
-    <div id="profileContainer" style="display: none;">
-      <section class="profile-hero">
-        <div class="profile-avatar" id="profileInitials">?</div>
-        <h1 id="profileName" style="font-size: 2.5rem; font-weight: 900; margin-bottom: 4px; letter-spacing: -1px;"></h1>
-        <p class="muted" id="profileDivision" style="font-size: 1.1rem; font-weight: 600;"></p>
-        
-        <div class="wsdc-row" style="justify-content: center; margin-top: 15px; display: flex; align-items: center; gap: 10px;">
-          <span id="profileWsdc" style="font-weight: 800; opacity: 0.8;"></span>
-          <a id="profileScoringLink" href="#" target="_blank" class="wsdc-link" style="color: var(--hfs-red); font-size: 1.4rem;">➔</a>
-        </div>
-      </section>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <span class="stat-value" id="statPoints">-</span>
-          <span class="stat-label">WSDC Pontok</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value" id="statEvents">-</span>
-          <span class="stat-label">Regisztrált versenyek</span>
-        </div>
-      </div>
-
-      <div id="profileContent" style="margin-top: 32px;">
-        </div>
-    </div>
-  </main>
+  </div>
 
   <script type="module" src="../assets/js/main.js"></script>
 </body>
