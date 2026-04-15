@@ -5,66 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Résztvevők – High Five Swing</title>
   <link rel="stylesheet" href="../assets/css/style.css" />
-  <style>
-    /* Kártya és gomb stílusok a dinamikus tartalomhoz */
-    .member-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-    }
-
-    .wsdc-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-      font-weight: 700;
-    }
-
-    .wsdc-link {
-      color: var(--hfs-red);
-      text-decoration: none;
-      font-size: 1.2rem;
-      transition: transform 0.2s;
-    }
-
-    .wsdc-link:hover {
-      transform: translateX(3px);
-    }
-
-    .card-footer {
-      margin-top: 20px;
-      border-top: 1px solid var(--border-color);
-      padding-top: 15px;
-    }
-
-    .profile-button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      background: var(--hfs-light-red);
-      color: var(--hfs-red);
-      text-align: center;
-      text-decoration: none;
-      border-radius: var(--radius-md);
-      font-weight: 800;
-      font-size: 0.85rem;
-      letter-spacing: 0.5px;
-      transition: all 0.2s;
-    }
-
-    .profile-button:hover {
-      background: var(--hfs-red);
-      color: white;
-    }
-
-    /* Szivárvány téma kompatibilitás */
-    [data-theme="rainbow"] .profile-button:hover {
-      background: linear-gradient(90deg, var(--rainbow-red), var(--rainbow-orange));
-      border-color: transparent;
-    }
-  </style>
 </head>
 <body>
   <header class="topbar">
