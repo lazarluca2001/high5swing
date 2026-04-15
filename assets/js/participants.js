@@ -238,7 +238,6 @@ function renderChart(results) {
         "Champion": "#B71C1C"
     };
 
-    /* ========= GROUP ========= */
     const byDivision = {};
 
     results.forEach(r => {
@@ -246,15 +245,13 @@ function renderChart(results) {
         byDivision[r.division].push(r);
     });
 
-    /* ========= DATASETS ========= */
     const datasets = Object.entries(byDivision).map(([division, events]) => {
 
-        // csak valid pontok
         const cleanEvents = events
             .filter(e => e.point > 0 && e.date)
             .sort((a, b) => a.date - b.date);
 
-        if (cleanEvents.length === 0) return null;
+        if (cleanEvents.length < 2) return null;
 
         let cumulative = 0;
 
@@ -262,7 +259,7 @@ function renderChart(results) {
             cumulative += e.point;
 
             return {
-                x: e.date,
+                x: e.date.toLocaleDateString("hu-HU"), // 🔥 STRING!
                 y: cumulative,
                 event: e.event,
                 partner: e.partner
@@ -273,13 +270,10 @@ function renderChart(results) {
             label: division,
             data,
             borderColor: COLORS[division] || "#999",
-            backgroundColor: COLORS[division] || "#999",
-            tension: 0.35,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            spanGaps: false // 🔥 fontos
+            tension: 0.4,
+            pointRadius: 5
         };
-    }).filter(Boolean); // null törlés
+    }).filter(Boolean);
 
     if (chartInstance) chartInstance.destroy();
 
@@ -290,11 +284,6 @@ function renderChart(results) {
             parsing: false,
             responsive: true,
 
-            interaction: {
-                mode: "nearest",
-                intersect: false
-            },
-
             plugins: {
                 legend: {
                     position: "right"
@@ -303,10 +292,7 @@ function renderChart(results) {
 
             scales: {
                 x: {
-                    type: "time",
-                    time: {
-                        unit: "month"
-                    }
+                    type: "category" // 🔥 EZ A FIX
                 },
                 y: {
                     beginAtZero: true
