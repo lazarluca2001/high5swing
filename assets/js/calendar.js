@@ -88,7 +88,9 @@ function renderMemberFilter() {
     const box = document.getElementById("memberFilter");
     if (!box) return;
     box.innerHTML = Object.entries(CAL_CONFIG.members).map(([name, emoji]) => `
-        <button class="filter-btn ${activeFilter === name ? 'active' : ''}" onclick="toggleFilter('${name}')">
+        <button class="filter-btn ${activeFilter === name ? 'active' : ''}" 
+                style="${activeFilter === name ? '' : 'opacity:0.6; filter:grayscale(1)'}"
+                onclick="toggleFilter('${name}')">
             ${emoji} ${name}
         </button>
     `).join("");
