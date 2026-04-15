@@ -1,6 +1,5 @@
 import { fetchCSV } from "./api.js";
-
-const rows = await fetchCSV("PARTICIPANTS");
+import { safeText } from "./utils.js";
 
 /* =========================
    SEGÉD: CSV → PEOPLE
@@ -46,11 +45,7 @@ export async function loadParticipantsFromSheet() {
     root.innerHTML = `<div class="card">Résztvevők betöltése...</div>`;
 
     try {
-        const res = await fetch(CSV_URLS.PARTICIPANTS, { cache: "no-store" });
-
-        if (!res.ok) throw new Error(`Fetch hiba: ${res.status}`);
-
-        const rows = parseCSV(await res.text());
+        const rows = await fetchCSV("PARTICIPANTS");
         const people = extractPeople(rows);
 
         if (!people.length) {
@@ -94,16 +89,15 @@ export async function loadProfileFromSheet() {
     }
 
     try {
-        const res = await fetch(CSV_URLS.PARTICIPANTS, { cache: "no-store" });
-
-        if (!res.ok) throw new Error(`Fetch hiba: ${res.status}`);
-
-        const rows = parseCSV(await res.text());
+        const rows = await fetchCSV("PARTICIPANTS");
         const people = extractPeople(rows);
 
         const person = people.find(p => p.wsdcId === id);
 
         if (!person) {
+            console.warn("Nem található profil ID:", id);
+            console.log("Elérhető ID-k:", people.map(p => p.wsdcId));
+
             loading.innerHTML = "Nincs ilyen profil.";
             return;
         }
