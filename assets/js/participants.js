@@ -252,73 +252,122 @@ function renderChart(results) {
     const canvas = document.getElementById("pointsChart");
     if (!canvas) return;
 
-    const allDates = [...new Set(results.map(r => r.date))]
-        .sort((a, b) => new Date(a) - new Date(b));
+    /* =========================
+       SZÍNEK
+    ========================= */
+    const COLORS = {
+        "Newcomer": "#4DC9F6",
+        "Novice": "#CE93D8",
+        "Intermediate": "#FFD54F",
+        "Advanced": "#66BB6A",
+        "All Star": "#6A1B9A",
+        "Champion": "#B71C1C"
+    };
 
+    /* =========================
+       GROUP BY DIVISION
+    ========================= */
     const byDivision = {};
+
     results.forEach(r => {
-        if (!byDivision[r.division]) byDivision[r.division] = [];
+        if (!byDivision[r.division]) {
+            byDivision[r.division] = [];
+        }
         byDivision[r.division].push(r);
     });
 
-    const COLORS = [
-        "#e53935",
-        "#8e24aa",
-        "#3949ab",
-        "#00897b",
-        "#fdd835",
-        "#fb8c00"
-    ];
-
-    let colorIndex = 0;
-
+    /* =========================
+       DATASETS (NO EMPTY LINES)
+    ========================= */
     const datasets = Object.entries(byDivision).map(([division, events]) => {
+
+        // dátum szerint
         events.sort((a, b) => new Date(a.date) - new Date(b.date));
 
         let cumulative = 0;
 
-        const data = allDates.map(date => {
-            events
-                .filter(e => e.date === date)
-                .forEach(e => {
-                    cumulative += Number(e.point) || 0;
-                });
+        const data = events.map(e => {
+            cumulative += Number(e.point) || 0;
 
-            return cumulative;
+            return {
+                x: new Date(e.date),
+                y: cumulative
+            };
         });
 
         return {
             label: division,
             data,
-            borderColor: COLORS[colorIndex++ % COLORS.length],
-            tension: 0.3
+            borderColor: COLORS[division] || "#999",
+            backgroundColor: COLORS[division] || "#999",
+            tension: 0.45,
+            fill: false,
+            spanGaps: false,
+            pointRadius: 5,
+            pointHoverRadius: 6
         };
     });
 
+    /* =========================
+       DESTROY PREVIOUS
+    ========================= */
     if (chartInstance) chartInstance.destroy();
 
+    /* =========================
+       CHART
+    ========================= */
     chartInstance = new Chart(canvas, {
         type: "line",
         data: {
-            labels: allDates,
             datasets
         },
         options: {
             responsive: true,
+
+            parsing: false, // fontos scatter-hez
+
+            interaction: {
+                mode: "nearest",
+                intersect: false
+            },
+
             plugins: {
                 legend: {
                     position: "right"
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const val = ctx.raw.y;
+                            const date = ctx.raw.x.toLocaleDateString("hu-HU");
+                            return `${ctx.dataset.label}: ${val} pont (${date})`;
+                        }
+                    }
                 }
             },
+
             scales: {
+                x: {
+                    type: "time",
+                    time: {
+                        unit: "month"
+                    },
+                    title: {
+                        display: true,
+                        text: "Idő"
+                    }
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Kumulált pont"
+                    }
                 }
             }
         }
     });
 }
-
 /* =========================
    ACTIONS
 ========================= */
