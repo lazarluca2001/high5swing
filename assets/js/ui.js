@@ -1,16 +1,25 @@
-import { CSV_URLS } from './config.js';
-import { parseCSV, safeText, parseCalendarDate } from './utils.js';
+import { fetchCSV } from './api.js';
+import { safeText, parseCalendarDate } from './utils.js';
 
+/* =========================
+   THEME
+========================= */
 export function setTheme(mode) {
     document.documentElement.dataset.theme = mode;
     localStorage.setItem("theme", mode);
 }
 
+/* =========================
+   GLOBAL SIDEBAR INIT
+========================= */
 export async function initGlobalSidebar() {
     initThemeSelectors();
     await renderNextEvent();
 }
 
+/* =========================
+   THEME SELECTOR
+========================= */
 function initThemeSelectors() {
     const selectors = [
         document.getElementById("themeSelector"),
@@ -23,38 +32,51 @@ function initThemeSelectors() {
 
     selectors.forEach(selector => {
         selector.value = currentTheme;
+
         selector.addEventListener("change", (e) => {
             const newTheme = e.target.value;
             setTheme(newTheme);
 
+            // sync más selectekkel
             selectors.forEach(other => {
-                if (other !== selector) other.value = newTheme;
+                if (other !== selector) {
+                    other.value = newTheme;
+                }
             });
         });
     });
 }
 
+/* =========================
+   NEXT EVENT
+========================= */
 async function renderNextEvent() {
     const target = document.getElementById("nextEventContent");
     if (!target) return;
 
-    try {
-        const res = await fetch(CSV_URLS.CALENDAR, { cache: "no-store" });
-        if (!res.ok) {
-            throw new Error(`Nem sikerült betölteni a naptár CSV-t (${res.status})`);
-        }
+    target.innerHTML = `<div class="muted">Betöltés...</div>`;
 
-        const rows = parseCSV(await res.text());
-        const headerIndex = rows.findIndex(r => r.some(c => safeText(c) === "Event"));
+    try {
+        // 🔥 KÖZPONTI FETCH
+        const rows = await fetchCSV("CALENDAR");
+
+        const headerIndex = rows.findIndex(r =>
+            r.some(c => safeText(c) === "Event")
+        );
 
         if (headerIndex === -1) {
-            throw new Error("Nem található az 'Event' fejléc a naptár táblában.");
+            throw new Error("Nem található az 'Event' fejléc.");
         }
 
         const headers = rows[headerIndex].map(h => safeText(h));
+
         const eventIdx = headers.indexOf("Event");
         const startIdx = headers.indexOf("Start date");
         const endIdx = headers.indexOf("End date");
+
+        if (eventIdx === -1 || startIdx === -1) {
+            throw new Error("Hiányzó oszlopok a naptárban.");
+        }
 
         const events = rows
             .slice(headerIndex + 1)
@@ -72,7 +94,11 @@ async function renderNextEvent() {
             .filter(e => e.startTs);
 
         const now = new Date();
-        const todayTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const todayTs = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+        ).getTime();
 
         const next = events
             .filter(e => e.endTs >= todayTs)
@@ -93,13 +119,18 @@ async function renderNextEvent() {
                 ${diff <= 0 ? "Ma kezdődik!" : `Még ${diff} nap`}
             </div>
         `;
+
     } catch (err) {
-        console.error("Következő esemény betöltési hiba:", err);
+        console.error("Következő esemény hiba:", err);
         target.innerHTML = "Nem sikerült betölteni.";
     }
 }
 
+/* =========================
+   DATE FORMAT
+========================= */
 function formatHungarianDate(ts) {
     const d = new Date(ts);
+
     return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, "0")}. ${String(d.getDate()).padStart(2, "0")}.`;
 }
