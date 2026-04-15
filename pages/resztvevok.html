@@ -5,15 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Résztvevők – High Five Swing</title>
   <link rel="stylesheet" href="../assets/css/style.css" />
+  <style>
+    /* Kártya belső elrendezése a gombhoz */
+    .member-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      transition: transform 0.2s ease;
+    }
+
+    .member-card:hover {
+      transform: translateY(-4px);
+    }
+
+    /* WSDC sor elrendezése a nyíllal */
+    .wsdc-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .wsdc-link {
+      color: var(--hfs-red);
+      font-size: 1.2rem;
+      line-height: 1;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+
+    .wsdc-link:hover {
+      transform: translateX(4px);
+    }
+
+    /* Profil gomb stílusa a kártya alján */
+    .card-footer {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .profile-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: var(--hfs-light-red);
+      color: var(--hfs-red);
+      text-align: center;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+      border: 1px solid color-mix(in srgb, var(--hfs-red) 15%, transparent);
+    }
+
+    .profile-button:hover {
+      background: var(--hfs-red);
+      color: white;
+    }
+
+    [data-theme="rainbow"] .profile-button:hover {
+      background: linear-gradient(90deg, var(--rainbow-red), var(--rainbow-orange));
+      border-color: transparent;
+    }
+  </style>
 </head>
 <body>
   <header class="topbar">
     <div class="brand">High Five Swing</div>
-    <nav class="nav">
-      <a href="../index.html">Kezdőlap</a>
-      <a href="./naptar.html">Naptár</a>
-      <a class="active" href="./resztvevok.html">Résztvevők</a>
-    </nav>
   </header>
 
   <div class="shell">
@@ -50,7 +115,7 @@
             <div class="tiny muted" style="margin-bottom:8px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;">
               Tagok szűrése
             </div>
-            <div class="member-selector" id="memberSelector"></div>
+            <div id="memberSelector" class="member-selector"></div>
           </div>
         </section>
 
