@@ -17,6 +17,21 @@ let activeRole = "Leader";
 let chartInstance = null;
 
 /* =========================
+   DATE PARSER (🔥 FIX)
+========================= */
+function parseDateSafe(str) {
+    const s = safeText(str);
+    if (!s) return null;
+
+    // támogatja: 2026.05.09 / 2026-05-09
+    const parts = s.replace(/\./g, "-").split("-").map(Number);
+
+    if (parts.length < 3) return null;
+
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+
+/* =========================
    PEOPLE
 ========================= */
 function extractPeople(rows) {
@@ -121,16 +136,17 @@ export async function loadProfileFromSheet() {
                 division: safeText(r[idx.division]),
                 role: safeText(r[idx.role]),
                 event: safeText(r[idx.event]),
-                date: safeText(r[idx.date]),
+                dateRaw: safeText(r[idx.date]),
+                date: parseDateSafe(r[idx.date]),
                 leader: safeText(r[idx.leader]),
                 follower: safeText(r[idx.follower]),
                 prelim: safeText(r[idx.prelim]),
                 semi: safeText(r[idx.semi]),
                 final: safeText(r[idx.final]),
-                point: safeText(r[idx.point]),
+                point: Number(r[idx.point]) || 0,
                 partner: safeText(r[idx.partner])
             }))
-            .filter(r => r.event);
+            .filter(r => r.event && r.date);
 
         /* ========= ROLE FILTER ========= */
         const filtered = results.filter(r =>
@@ -166,7 +182,7 @@ export async function loadProfileFromSheet() {
         sortedDivisions.forEach(division => {
             const events = grouped[division];
 
-            events.sort((a, b) => new Date(b.date) - new Date(a.date));
+            events.sort((a, b) => b.date - a.date);
 
             html += `<h2 class="division-title">${division}</h2>`;
 
@@ -192,7 +208,7 @@ export async function loadProfileFromSheet() {
                         <div class="event-header" onclick="toggleAccordion(${i})">
                             <div>
                                 <div class="event-name">${r.event}</div>
-                                <div class="event-date">${r.date}</div>
+                                <div class="event-date">${r.dateRaw}</div>
                             </div>
 
                             <div>
@@ -200,7 +216,7 @@ export async function loadProfileFromSheet() {
                                     ${r.final || "-"}
                                 </span>
                                 <span class="res-badge point">
-                                    +${r.point || 0}
+                                    +${r.point}
                                 </span>
                             </div>
                         </div>
@@ -246,15 +262,12 @@ export async function loadProfileFromSheet() {
 }
 
 /* =========================
-   CHART (MULTI LINE)
+   CHART (FINAL CLEAN)
 ========================= */
 function renderChart(results) {
     const canvas = document.getElementById("pointsChart");
     if (!canvas) return;
 
-    /* =========================
-       SZÍNEK
-    ========================= */
     const COLORS = {
         "Newcomer": "#4DC9F6",
         "Novice": "#CE93D8",
@@ -264,34 +277,32 @@ function renderChart(results) {
         "Champion": "#B71C1C"
     };
 
-    /* =========================
-       GROUP BY DIVISION
-    ========================= */
     const byDivision = {};
 
     results.forEach(r => {
-        if (!byDivision[r.division]) {
-            byDivision[r.division] = [];
-        }
+        if (!byDivision[r.division]) byDivision[r.division] = [];
         byDivision[r.division].push(r);
     });
 
-    /* =========================
-       DATASETS (NO EMPTY LINES)
-    ========================= */
-    const datasets = Object.entries(byDivision).map(([division, events]) => {
+    const sortedDivisions = Object.keys(byDivision).sort((a, b) => {
+        const ai = DIVISION_ORDER.indexOf(a);
+        const bi = DIVISION_ORDER.indexOf(b);
+        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    });
 
-        // dátum szerint
-        events.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const datasets = sortedDivisions.map(division => {
+        const events = byDivision[division].sort((a, b) => a.date - b.date);
 
         let cumulative = 0;
 
         const data = events.map(e => {
-            cumulative += Number(e.point) || 0;
+            cumulative += e.point;
 
             return {
-                x: new Date(e.date),
-                y: cumulative
+                x: e.date,
+                y: cumulative,
+                event: e.event,
+                partner: e.partner
             };
         });
 
@@ -301,73 +312,36 @@ function renderChart(results) {
             borderColor: COLORS[division] || "#999",
             backgroundColor: COLORS[division] || "#999",
             tension: 0.45,
-            fill: false,
-            spanGaps: false,
-            pointRadius: 5,
-            pointHoverRadius: 6
+            pointRadius: 5
         };
     });
 
-    /* =========================
-       DESTROY PREVIOUS
-    ========================= */
     if (chartInstance) chartInstance.destroy();
 
-    /* =========================
-       CHART
-    ========================= */
     chartInstance = new Chart(canvas, {
         type: "line",
-        data: {
-            datasets
-        },
+        data: { datasets },
         options: {
-            responsive: true,
-
-            parsing: false, // fontos scatter-hez
-
-            interaction: {
-                mode: "nearest",
-                intersect: false
-            },
-
+            parsing: false,
             plugins: {
-                legend: {
-                    position: "right"
-                },
+                legend: { position: "right" },
                 tooltip: {
                     callbacks: {
-                        label: function(ctx) {
-                            const val = ctx.raw.y;
-                            const date = ctx.raw.x.toLocaleDateString("hu-HU");
-                            return `${ctx.dataset.label}: ${val} pont (${date})`;
+                        label: ctx => {
+                            const d = ctx.raw;
+                            return `${ctx.dataset.label}: ${d.y} pont – ${d.event} (${d.partner})`;
                         }
                     }
                 }
             },
-
             scales: {
-                x: {
-                    type: "time",
-                    time: {
-                        unit: "month"
-                    },
-                    title: {
-                        display: true,
-                        text: "Idő"
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: "Kumulált pont"
-                    }
-                }
+                x: { type: "time" },
+                y: { beginAtZero: true }
             }
         }
     });
 }
+
 /* =========================
    ACTIONS
 ========================= */
