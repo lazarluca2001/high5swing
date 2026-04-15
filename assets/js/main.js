@@ -3,22 +3,27 @@ import { loadParticipantsFromSheet, loadProfileFromSheet } from './participants.
 import { initCalendarPage } from './calendar.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
+    try {
+        const savedTheme = localStorage.getItem("theme") || "light";
+        setTheme(savedTheme);
 
-    await initGlobalSidebar();
-    initSidebarToggle();
+        await initGlobalSidebar();
+        initSidebarToggle();
 
-    if (document.getElementById("participants")) {
-        loadParticipantsFromSheet();
-    }
+        if (document.getElementById("participants")) {
+            await loadParticipantsFromSheet();
+        }
 
-    if (document.getElementById("profileContent")) {
-        loadProfileFromSheet();
-    }
+        if (document.getElementById("profileContent")) {
+            await loadProfileFromSheet();
+        }
 
-    if (document.getElementById("calendar")) {
-        initCalendarPage();
+        if (document.getElementById("calendar")) {
+            await initCalendarPage();
+        }
+
+    } catch (e) {
+        console.error("MAIN ERROR:", e);
     }
 });
 
