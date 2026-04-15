@@ -238,27 +238,48 @@ function renderChart(results) {
         "Champion": "#B71C1C"
     };
 
+    /* ========= GROUP ========= */
     const byDivision = {};
+
     results.forEach(r => {
         if (!byDivision[r.division]) byDivision[r.division] = [];
         byDivision[r.division].push(r);
     });
 
-    const datasets = Object.keys(byDivision).map(division => {
-        const events = byDivision[division].sort((a, b) => a.date - b.date);
+    /* ========= DATASETS ========= */
+    const datasets = Object.entries(byDivision).map(([division, events]) => {
+
+        // csak valid pontok
+        const cleanEvents = events
+            .filter(e => e.point > 0 && e.date)
+            .sort((a, b) => a.date - b.date);
+
+        if (cleanEvents.length === 0) return null;
 
         let cumulative = 0;
 
+        const data = cleanEvents.map(e => {
+            cumulative += e.point;
+
+            return {
+                x: e.date,
+                y: cumulative,
+                event: e.event,
+                partner: e.partner
+            };
+        });
+
         return {
             label: division,
-            data: events.map(e => {
-                cumulative += e.point;
-                return { x: e.date, y: cumulative };
-            }),
+            data,
             borderColor: COLORS[division] || "#999",
-            tension: 0.4
+            backgroundColor: COLORS[division] || "#999",
+            tension: 0.35,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            spanGaps: false // 🔥 fontos
         };
-    });
+    }).filter(Boolean); // null törlés
 
     if (chartInstance) chartInstance.destroy();
 
@@ -267,12 +288,29 @@ function renderChart(results) {
         data: { datasets },
         options: {
             parsing: false,
-            plugins: {
-                legend: { position: "right" }
+            responsive: true,
+
+            interaction: {
+                mode: "nearest",
+                intersect: false
             },
+
+            plugins: {
+                legend: {
+                    position: "right"
+                }
+            },
+
             scales: {
-                x: { type: "time" },
-                y: { beginAtZero: true }
+                x: {
+                    type: "time",
+                    time: {
+                        unit: "month"
+                    }
+                },
+                y: {
+                    beginAtZero: true
+                }
             }
         }
     });
