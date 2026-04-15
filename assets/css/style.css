@@ -72,92 +72,108 @@ body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-colo
 }
 
 /* =========================================
-   4. NAPTÁR SPECIFIKUS (FIXED STRUCTURE)
+   4. NAPTÁR OLDAL - TELJES JAVÍTÁS
    ========================================= */
 
-/* Fő elrendezés visszaállítása */
+/* Fő elrendezés: Sidebar és Naptár aránya */
 .calendar-page .calendar-layout {
     display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 24px;
-    padding-top: 10px;
+    grid-template-columns: 280px 1fr;
+    gap: 30px;
+    align-items: start;
 }
 
-/* FEJLÉC JAVÍTÁSA */
+/* --- FEJLÉC ÉS VEZÉRLŐK --- */
 .calendar-page .month-display-container {
     background: var(--card-bg);
     border-radius: var(--radius-xl);
     padding: 30px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
     display: flex;
-    flex-direction: column; /* Egymás alá kerülnek a csoportok */
+    flex-direction: column;
     align-items: center;
-    gap: 15px;
-    text-align: center;
+    gap: 20px;
 }
 
-/* A Hónap neve és a nyilak egy sorban */
 .calendar-page .month-title-group {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 25px;
     width: 100%;
 }
 
 .calendar-page .month-display {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 900;
+    color: var(--hfs-red);
     margin: 0;
     text-transform: uppercase;
-    letter-spacing: 3px;
-    color: var(--hfs-red); /* Rainbow módban ez változik */
+    letter-spacing: 4px;
+    min-width: 250px;
+    text-align: center;
 }
 
-/* A "Ma" gomb és a Select egy sorban */
 .calendar-page .controls-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
+    gap: 12px;
 }
 
-/* Gombok stílusa (a 2. képen látható kerekített forma) */
+/* Navigációs gombok (Kerekített, mint a 2. képen) */
 .calendar-page .nav-btn, 
 .calendar-page .today-btn {
     background: var(--hfs-red);
     color: white;
     border: none;
-    border-radius: 50px; /* Teljesen kerekített */
-    padding: 8px 20px;
-    font-weight: 800;
+    border-radius: 50px;
     cursor: pointer;
-    transition: 0.2s;
+    font-weight: 800;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 10px rgba(128, 0, 0, 0.2);
 }
 
 .calendar-page .nav-btn {
-    width: 40px;
-    height: 40px;
-    padding: 0;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+}
+
+.calendar-page .today-btn {
+    padding: 10px 24px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
 }
 
 .calendar-page .nav-btn:hover, 
 .calendar-page .today-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
     filter: brightness(1.2);
 }
 
-/* OLDALSÁV (SIDEBAR) VISSZAÁLLÍTÁSA */
+/* --- OLDALSÁV (SIDEBAR) --- */
 .calendar-page .sidebar {
-    position: sticky;
-    top: 100px;
     background: transparent;
     border: none;
     box-shadow: none;
+    position: sticky;
+    top: 90px;
+}
+
+.calendar-page .sidebar-head {
+    padding: 0 0 20px 10px;
+    border: none;
+}
+
+.calendar-page .sidebar-title {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--hfs-red);
 }
 
 .calendar-page .side-card {
@@ -165,25 +181,35 @@ body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-colo
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 20px;
-    margin: 0 0 15px 0; /* Csak alul margó */
+    margin: 0 0 20px 0;
     box-shadow: var(--shadow);
 }
 
 .calendar-page .side-card h3 {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--hfs-red);
     text-transform: uppercase;
-    margin-bottom: 12px;
-    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--hfs-light-red);
+    padding-bottom: 8px;
 }
 
-/* NAPTÁR RÁCS ÉS NAPOK */
+/* --- NAPTÁR RÁCS ÉS NAPOK --- */
 .calendar-page .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
+    gap: 12px;
     background: transparent;
     border: none;
+}
+
+.calendar-page .weekday {
+    background: transparent;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.7rem;
+    height: 40px;
 }
 
 .calendar-page .day {
@@ -191,19 +217,37 @@ body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-colo
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     min-height: 150px;
-    transition: 0.2s;
+    padding: 12px;
+    transition: transform 0.2s ease;
+}
+
+.calendar-page .day:hover {
+    border-color: var(--hfs-red);
+    transform: translateY(-3px);
 }
 
 .calendar-page .day.today {
-    box-shadow: inset 0 0 0 2px var(--hfs-red);
-    background: color-mix(in srgb, var(--card-bg), var(--hfs-red) 5%);
+    border: 2px solid var(--hfs-red);
+    background: color-mix(in srgb, var(--card-bg), var(--hfs-red) 3%);
 }
 
-/* Szivárvány téma korrekció */
-[data-theme="rainbow"] .calendar-page .month-display {
-    color: #ff9a1f;
+.calendar-page .day-number {
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    display: block;
+    opacity: 1;
 }
 
+/* Eseménykártyák a naptárban */
+.calendar-page .event-card {
+    background: var(--hfs-light-red);
+    border-radius: 8px;
+    padding: 8px;
+    border-left: 4px solid var(--hfs-red);
+}
+
+/* Rainbow téma finomhangolás */
 [data-theme="rainbow"] .calendar-page .nav-btn,
 [data-theme="rainbow"] .calendar-page .today-btn {
     background: linear-gradient(45deg, #ff9a1f, #ff4d4d);
