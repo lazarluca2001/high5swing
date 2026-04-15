@@ -358,6 +358,36 @@ button {
 .res-badge.silver { background: silver; color: black; }
 .res-badge.bronze { background: #cd7f32; color: white; }
 
+.chart-tooltip {
+  position: absolute;
+  background: #1e1e1e;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  pointer-events: none;
+  transform: translate(-50%, -120%);
+  opacity: 0;
+  transition: 0.15s ease;
+  font-size: 13px;
+  min-width: 180px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  z-index: 999;
+}
+
+.chart-tooltip.active {
+  opacity: 1;
+}
+
+.chart-tooltip .title {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.chart-tooltip .row {
+  display: flex;
+  justify-content: space-between;
+}
+
 /* =========================================
    13. MOBILE
    ========================================= */
