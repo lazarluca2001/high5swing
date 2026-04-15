@@ -14,6 +14,7 @@ const DIVISION_ORDER = [
 ];
 
 let activeRole = "Leader";
+let chartInstance = null;
 
 /* =========================
    PEOPLE
@@ -97,6 +98,11 @@ export async function loadProfileFromSheet() {
             r.some(c => safeText(c).toLowerCase() === "name")
         );
 
+        if (headerIndex === -1) {
+            content.innerHTML = `<div class="card">Nincs adat</div>`;
+            return;
+        }
+
         const headers = resultRows[headerIndex].map(h => safeText(h).toLowerCase());
         const get = (n) => headers.indexOf(n);
 
@@ -138,18 +144,22 @@ export async function loadProfileFromSheet() {
             (r.role || "").toLowerCase() === activeRole.toLowerCase()
         );
 
+        /* ========= CHART ========= */
+        renderChart(filtered);
+
         /* ========= GROUP ========= */
         const grouped = {};
-
         filtered.forEach(r => {
             if (!grouped[r.division]) grouped[r.division] = [];
             grouped[r.division].push(r);
         });
 
         /* ========= DIVISION SORT ========= */
-        const sortedDivisions = Object.keys(grouped).sort(
-            (a, b) => DIVISION_ORDER.indexOf(a) - DIVISION_ORDER.indexOf(b)
-        );
+        const sortedDivisions = Object.keys(grouped).sort((a, b) => {
+            const ai = DIVISION_ORDER.indexOf(a);
+            const bi = DIVISION_ORDER.indexOf(b);
+            return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+        });
 
         /* ========= RENDER ========= */
         let html = `
@@ -164,7 +174,7 @@ export async function loadProfileFromSheet() {
         sortedDivisions.forEach(division => {
             const events = grouped[division];
 
-            // 👉 FONTOS: rendezés dátum szerint (FRISS → RÉGI)
+            // FRISS → RÉGI
             events.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             html += `<h2 class="division-title">${division}</h2>`;
@@ -248,12 +258,51 @@ export async function loadProfileFromSheet() {
 }
 
 /* =========================
+   CHART
+========================= */
+function renderChart(results) {
+    const canvas = document.getElementById("pointsChart");
+    if (!canvas) return;
+
+    const sorted = [...results].sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+    );
+
+    const labels = sorted.map(r => r.date);
+    const data = sorted.map(r => Number(r.point) || 0);
+
+    let cumulative = [];
+    data.reduce((sum, val, i) => {
+        cumulative[i] = sum + val;
+        return cumulative[i];
+    }, 0);
+
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(canvas, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Pontok (kumulált)",
+                data: cumulative,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+/* =========================
    ACTIONS
 ========================= */
 window.toggleAccordion = (i) => {
-    const el = document.getElementById(`acc-${i}`);
-    if (!el) return;
-    el.classList.toggle("active");
+    document.getElementById(`acc-${i}`)?.classList.toggle("active");
 };
 
 window.setRole = (role) => {
