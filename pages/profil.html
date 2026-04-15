@@ -6,7 +6,7 @@
   <title>Profil – High Five Swing</title>
   <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
-<body>
+<body class="profile-page">
   <header class="topbar">
     <div class="brand">High Five Swing</div>
     <nav class="nav">
@@ -16,20 +16,41 @@
     </nav>
   </header>
 
-  <main class="container">
-    <div class="profile-head">
-      <div>
-        <h1 id="profileName">Profil</h1>
-        <p class="muted" id="profileSub">Versenyeredmények (Sheets import)</p>
-      </div>
-      <div class="profile-actions">
-        <a class="btn" href="./resztvevok.html">← Vissza</a>
-      </div>
+  <main class="shell">
+    <div class="profile-actions" style="margin-bottom: 20px;">
+      <a class="side-link" href="./resztvevok.html" style="display: inline-flex; width: auto;">← Vissza a résztvevőkhöz</a>
     </div>
 
-    <div id="profileContent"></div>
+    <div id="profileLoading" class="card">Adatok betöltése a Google Sheets-ből...</div>
+
+    <div id="profileContainer" style="display: none;">
+      <section class="profile-hero">
+        <div class="profile-avatar" id="profileInitials">?</div>
+        <h1 id="profileName" style="font-size: 2.5rem; font-weight: 900; margin-bottom: 4px;">Név betöltése...</h1>
+        <p class="muted" id="profileDivision" style="font-size: 1.1rem;">Divízió...</p>
+        
+        <div class="wsdc-row" style="justify-content: center; margin-top: 15px;">
+          <span id="profileWsdc">WSDC: -</span>
+          <a id="profileScoringLink" href="#" target="_blank" class="wsdc-link">➔</a>
+        </div>
+      </section>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-value" id="statPoints">-</span>
+          <span class="stat-label">WSDC Pontok</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="statEvents">-</span>
+          <span class="stat-label">Versenyek</span>
+        </div>
+      </div>
+
+      <div id="profileContent" style="margin-top: 32px;">
+          </div>
+    </div>
   </main>
 
-  <script type="module" src="../js/main.js"></script>
+  <script type="module" src="../assets/js/main.js"></script>
 </body>
 </html>
