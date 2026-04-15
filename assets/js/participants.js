@@ -1,5 +1,6 @@
-import { CSV_URLS } from "./config.js";
-import { parseCSV, safeText } from "./utils.js";
+import { fetchCSV } from "./api.js";
+
+const rows = await fetchCSV("PARTICIPANTS");
 
 /* =========================
    SEGÉD: CSV → PEOPLE
