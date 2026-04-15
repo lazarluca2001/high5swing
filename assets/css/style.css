@@ -330,6 +330,34 @@ button {
 .res-badge.silver { background: silver; color: black; }
 .res-badge.bronze { background: #cd7f32; color: white; }
 
+.role-switch {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.role-switch button {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    cursor: pointer;
+}
+
+.role-switch button.active {
+    background: var(--hfs-red);
+    color: white;
+}
+
+.division-title {
+    margin-top: 24px;
+    font-weight: 900;
+}
+
+.res-badge.gold { background: gold; color: black; }
+.res-badge.silver { background: silver; color: black; }
+.res-badge.bronze { background: #cd7f32; color: white; }
+
 /* =========================================
    13. MOBILE
    ========================================= */
