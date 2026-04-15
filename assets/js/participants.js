@@ -43,6 +43,8 @@ function extractPeople(rows) {
         r.some(c => safeText(c).toLowerCase() === "name")
     );
 
+    if (headerIndex === -1) return [];
+
     const headers = rows[headerIndex].map(h => safeText(h).toLowerCase());
 
     return rows
@@ -53,6 +55,35 @@ function extractPeople(rows) {
             wsdcId: safeText(r[headers.indexOf("wsdc id")])
         }))
         .filter(p => p.name && p.wsdcId);
+}
+
+/* =========================
+   PARTICIPANTS LISTA ✅
+========================= */
+export async function loadParticipantsFromSheet() {
+    const root = document.getElementById("participants");
+    if (!root) return;
+
+    root.innerHTML = `<div class="card">Betöltés...</div>`;
+
+    try {
+        const rows = await fetchCSV("PARTICIPANTS");
+        const people = extractPeople(rows);
+
+        root.innerHTML = people.map(p => `
+            <div class="card">
+                <h2>${p.name}</h2>
+                <p>${p.division || "—"}</p>
+                <a href="./profil.html?id=${encodeURIComponent(p.wsdcId)}">
+                    Profil
+                </a>
+            </div>
+        `).join("");
+
+    } catch (e) {
+        console.error(e);
+        root.innerHTML = `<div class="card">Hiba történt</div>`;
+    }
 }
 
 /* =========================
@@ -79,14 +110,8 @@ export async function loadProfileFromSheet() {
         setText("profileName", person.name);
         setText("profileDivision", person.division);
         setText("profileWsdc", person.wsdcId);
+        setText("profileInitials", person.name.split(" ").map(n => n[0]).join(""));
 
-        // avatar initials
-        setText(
-            "profileInitials",
-            person.name.split(" ").map(n => n[0]).join("")
-        );
-
-        // WSDC link
         const link = document.getElementById("profileScoringLink");
         if (link) {
             link.href = `https://www.worldsdc.com/registry-points/?num=${person.wsdcId}`;
@@ -110,8 +135,6 @@ export async function loadProfileFromSheet() {
             event: get("event"),
             date: get("date"),
             role: get("role"),
-            leader: get("leader"),
-            follower: get("follower"),
             prelim: get("prelim"),
             semi: get("semi"),
             final: get("final"),
@@ -128,29 +151,19 @@ export async function loadProfileFromSheet() {
                 event: safeText(r[idx.event]),
                 dateRaw: safeText(r[idx.date]),
                 date: parseDateSafe(r[idx.date]),
-                leader: safeText(r[idx.leader]),
-                follower: safeText(r[idx.follower]),
                 prelim: safeText(r[idx.prelim]),
                 semi: safeText(r[idx.semi]),
                 final: safeText(r[idx.final]),
-                point: (() => {
-                    const raw = safeText(r[idx.point]);
-                    const cleaned = raw.replace(",", ".").match(/-?\d+(\.\d+)?/);
-                    return cleaned ? parseFloat(cleaned[0]) : 0;
-                })(),
+                point: Number(safeText(r[idx.point])) || 0,
                 partner: safeText(r[idx.partner])
             }))
             .filter(r => r.event && r.date);
 
-        /* ========= ROLE FILTER ========= */
         const filtered = results.filter(r =>
             (r.role || "").toLowerCase() === activeRole.toLowerCase()
         );
 
-        /* ========= CHART ========= */
         renderChart(filtered);
-
-        /* ========= EVENTS RENDER ========= */
         renderEvents(filtered, content);
 
         loading.style.display = "none";
@@ -187,34 +200,27 @@ function renderChart(results) {
 
     const datasets = Object.entries(byDivision).map(([division, events]) => {
 
-        // 🔥 FIX 1: csak valid pontok
         const clean = events
             .filter(e => e.point > 0 && e.date)
             .sort((a, b) => a.date - b.date);
 
-        // 🔥 FIX 2: minimum 2 pont
         if (clean.length < 2) return null;
 
         let cumulative = 0;
 
-        const data = clean.map((e, index) => {
-            cumulative += e.point;
-
-            return {
-                x: `${e.date.toLocaleDateString("hu-HU")} #${index}`, // 🔥 FIX 3
-                y: cumulative,
-                event: e.event,
-                partner: e.partner
-            };
-        });
-
         return {
             label: division,
-            data,
+            data: clean.map((e, i) => {
+                cumulative += e.point;
+                return {
+                    x: `${e.date.toLocaleDateString("hu-HU")} #${i}`,
+                    y: cumulative,
+                    event: e.event,
+                    partner: e.partner
+                };
+            }),
             borderColor: COLORS[division] || "#999",
-            tension: 0.4,
-            pointRadius: 5,
-            pointHoverRadius: 7
+            tension: 0.4
         };
     }).filter(Boolean);
 
@@ -225,64 +231,22 @@ function renderChart(results) {
         data: { datasets },
         options: {
             parsing: false,
-            responsive: true,
-
-            interaction: {
-                mode: "nearest",
-                intersect: false
-            },
-
-            plugins: {
-                legend: { position: "right" },
-
-                tooltip: {
-                    enabled: false,
-                    external: function(ctx) {
-
-                        const tooltipEl = document.getElementById("chartTooltip");
-                        const tooltip = ctx.tooltip;
-
-                        if (!tooltip || tooltip.opacity === 0) {
-                            tooltipEl.classList.remove("active");
-                            return;
-                        }
-
-                        const p = tooltip.dataPoints[0].raw;
-
-                        tooltipEl.innerHTML = `
-                            <div class="title">${p.event}</div>
-                            <div>Pont: ${p.y}</div>
-                            <div>Partner: ${p.partner || "-"}</div>
-                        `;
-
-                        const rect = ctx.chart.canvas.getBoundingClientRect();
-
-                        tooltipEl.style.left = rect.left + tooltip.caretX + "px";
-                        tooltipEl.style.top = rect.top + tooltip.caretY + "px";
-
-                        tooltipEl.classList.add("active");
-                    }
-                }
-            },
-
+            plugins: { legend: { position: "right" } },
             scales: {
                 x: {
                     type: "category",
                     ticks: {
-                        callback: function(value) {
-                            return value.split(" #")[0]; // eltünteti indexet
-                        }
+                        callback: v => v.split(" #")[0]
                     }
                 },
-                y: {
-                    beginAtZero: true
-                }
+                y: { beginAtZero: true }
             }
         }
     });
 }
+
 /* =========================
-   EVENTS (ACCORDION)
+   EVENTS
 ========================= */
 function renderEvents(results, container) {
 
@@ -293,63 +257,26 @@ function renderEvents(results, container) {
         grouped[r.division].push(r);
     });
 
-    const sortedDivisions = Object.keys(grouped).sort((a, b) => {
-        return DIVISION_ORDER.indexOf(a) - DIVISION_ORDER.indexOf(b);
-    });
-
     let html = `
         <div class="role-switch">
-            <button onclick="setRole('Leader')" class="${activeRole==="Leader"?"active":""}">Leader</button>
-            <button onclick="setRole('Follower')" class="${activeRole==="Follower"?"active":""}">Follower</button>
+            <button onclick="setRole('Leader')">Leader</button>
+            <button onclick="setRole('Follower')">Follower</button>
         </div>
     `;
 
-    let i = 0;
+    Object.keys(grouped).forEach(div => {
+        html += `<h2>${div}</h2>`;
 
-    sortedDivisions.forEach(division => {
-
-        html += `<h2 class="division-title">${division}</h2>`;
-
-        grouped[division]
-            .sort((a, b) => b.date - a.date)
-            .forEach(r => {
-
-                html += `
-                <div class="event-accordion-item">
-                    <div class="event-header" onclick="toggleAccordion(${i})">
-                        <div>
-                            <div class="event-name">${r.event}</div>
-                            <div class="event-date">${r.dateRaw}</div>
-                        </div>
-
-                        <div>
-                            <span class="res-badge">${r.final || "-"}</span>
-                            <span class="res-badge point">+${r.point}</span>
-                        </div>
-                    </div>
-
-                    <div class="event-body" id="acc-${i}">
-                        <div class="details-grid">
-                            <div class="det">
-                                <label>Partner</label>
-                                <span>${r.partner || "-"}</span>
-                            </div>
-
-                            <div class="det">
-                                <label>Prelim</label>
-                                <span>${r.prelim || "-"}</span>
-                            </div>
-
-                            <div class="det">
-                                <label>Semi</label>
-                                <span>${r.semi || "-"}</span>
-                            </div>
-                        </div>
-                    </div>
+        grouped[div].forEach((r, i) => {
+            html += `
+                <div onclick="toggleAccordion(${i})">
+                    ${r.event} (+${r.point})
                 </div>
-                `;
-                i++;
-            });
+                <div id="acc-${i}" style="display:none">
+                    Partner: ${r.partner}
+                </div>
+            `;
+        });
     });
 
     container.innerHTML = html;
@@ -357,7 +284,8 @@ function renderEvents(results, container) {
 
 /* ========================= */
 window.toggleAccordion = (i) => {
-    document.getElementById(`acc-${i}`)?.classList.toggle("active");
+    const el = document.getElementById(`acc-${i}`);
+    if (el) el.style.display = el.style.display === "none" ? "block" : "none";
 };
 
 window.setRole = (role) => {
