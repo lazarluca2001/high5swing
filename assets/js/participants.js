@@ -257,25 +257,35 @@ function renderEvents(results, container) {
     `;
 
     Object.keys(grouped).forEach(div => {
-        html += `<h2>${div}</h2>`;
+
+        html += `
+            <div class="division-block">
+                <div class="division-header">${div}</div>
+                <div class="event-list">
+        `;
 
         grouped[div].forEach((r, i) => {
-            const id = `${div}-${i}`;
-
             html += `
-                <div onclick="toggleAccordion('${id}')">
-                    ${r.event} (+${r.point})
-                </div>
-                <div id="acc-${id}" style="display:none">
-                    Partner: ${r.partner}
+                <div class="event-item">
+                    <div class="event-main">
+                        <div class="event-title">${r.event}</div>
+                        <div class="event-partner">👤 ${r.partner || "—"}</div>
+                    </div>
+                    <div class="event-points ${r.point > 0 ? 'positive' : ''}">
+                        +${r.point}
+                    </div>
                 </div>
             `;
         });
+
+        html += `
+                </div>
+            </div>
+        `;
     });
 
     container.innerHTML = html;
 }
-
 /* ========================= */
 window.toggleAccordion = (id) => {
     const el = document.getElementById(`acc-${id}`);
