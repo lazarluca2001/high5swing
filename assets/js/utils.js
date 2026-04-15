@@ -52,21 +52,13 @@ export function safeText(v) {
 export function parseCalendarDate(dateStr) {
     const s = safeText(dateStr);
     if (!s) return null;
-
-    const parsed = Date.parse(s);
+    
+    // Kezeli a 2026.01.15 formátumot is
+    const cleanDate = s.replace(/\s/g, '').replace(/\./g, '-');
+    const parsed = Date.parse(cleanDate);
+    
     if (!Number.isNaN(parsed)) {
-        const d = new Date(parsed);
-        return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+        return new Date(parsed).setHours(0,0,0,0);
     }
-
-    const m = s.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})$/);
-    if (m) {
-        return new Date(
-            Number(m[3]),
-            Number(m[2]) - 1,
-            Number(m[1])
-        ).setHours(0, 0, 0, 0);
-    }
-
     return null;
 }
