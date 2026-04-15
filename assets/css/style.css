@@ -388,6 +388,76 @@ button {
   justify-content: space-between;
 }
 
+/* =========================
+   PROFILE EVENTS UI
+========================= */
+
+.division-block {
+  margin-top: 24px;
+}
+
+.division-header {
+  font-size: 1.2rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+  padding-left: 6px;
+  border-left: 4px solid var(--hfs-red);
+}
+
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+
+  transition: 0.2s;
+}
+
+.event-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--hfs-red);
+}
+
+.event-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-title {
+  font-weight: 700;
+}
+
+.event-partner {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.event-points {
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eee;
+  font-size: 0.8rem;
+}
+
+.event-points.positive {
+  background: var(--hfs-light-red);
+  color: var(--hfs-red);
+}
+
 /* =========================================
    13. MOBILE
    ========================================= */
