@@ -299,7 +299,7 @@ function renderChart(results) {
             cumulative += e.point;
 
             return {
-                x: e.date.toLocaleDateString("hu-HU")
+                x: e.date.toLocaleDateString("hu-HU"),
                 y: cumulative,
                 event: e.event,
                 partner: e.partner
