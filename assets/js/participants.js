@@ -14,13 +14,13 @@ export async function loadParticipantsFromSheet() {
         })).filter(p => p.name);
 
         root.innerHTML = people.map(p => `
-            <div class="card member-card">
-                <h2 style="font-size: 1.25rem; font-weight: 900;">${p.name}</h2>
-                <p class="muted">${p.division}</p>
-                <div style="margin: 10px 0; font-weight: bold;">WSDC: ${p.wsdcId} <a href="https://scoring.dance/huHU/wsdc/registry/${p.wsdcId}.html" target="_blank">➔</a></div>
-                <a href="profil.html?id=${p.wsdcId}" class="profile-button" style="display:block; text-align:center; padding:10px; background:var(--hfs-light-red); color:var(--hfs-red); border-radius:var(--radius-md); font-weight:800; text-decoration:none;">PROFIL</a>
-            </div>
-        `).join("");
+    <div class="card member-card">
+        <h2 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 8px;">${p.name}</h2>
+        <p class="muted">${p.division}</p>
+        <div style="margin: 12px 0; font-weight: 700; opacity: 0.8;">WSDC: ${p.wsdcId}</div>
+        <a href="profil.html?id=${p.wsdcId}" class="profile-button">PROFIL</a>
+    </div>
+`).join("");
     } catch (e) { root.innerHTML = "Hiba történt a betöltéskor."; }
 }
 
