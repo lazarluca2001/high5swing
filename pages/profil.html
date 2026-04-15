@@ -6,8 +6,6 @@
   <title>Profil – High Five Swing</title>
 
   <link rel="stylesheet" href="../assets/css/style.css" />
-
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -15,15 +13,14 @@
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       padding: 30px;
-      border-radius: 20px;
+      border-radius: var(--radius-xl);
       text-align: center;
-      margin-bottom: 24px;
       box-shadow: var(--shadow);
     }
 
     .profile-avatar {
-      width: 80px;
-      height: 80px;
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
       background: var(--hfs-red);
       color: white;
@@ -31,68 +28,96 @@
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 2rem;
+      font-size: 2.2rem;
       margin: 0 auto 12px;
     }
 
-    .chart-tooltip {
-      position: fixed; /* 🔥 fontos */
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 0.8rem;
-      pointer-events: none;
-      opacity: 0;
-      transform: translate(-50%, -120%);
-      transition: 0.2s;
-      z-index: 999;
-      box-shadow: var(--shadow);
+    .profile-meta {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
     }
 
-    .chart-tooltip.active { opacity: 1; }
+    .profile-meta a {
+      margin-left: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      color: var(--hfs-red);
+    }
 
-    .chart-tooltip .title {
-      font-weight: 800;
-      margin-bottom: 6px;
+    .chart-card {
+      margin-top: 20px;
+    }
+
+    .events-card {
+      margin-top: 20px;
     }
   </style>
 </head>
 
-<body class="profile-page">
+<body>
 
 <header class="topbar">
   <div class="brand">High Five Swing</div>
+  <nav class="nav">
+    <a href="../index.html">Kezdőlap</a>
+    <a href="./naptar.html">Naptár</a>
+    <a href="./resztvevok.html">Résztvevők</a>
+  </nav>
 </header>
 
 <div class="shell">
-  <main class="container">
+  <div class="layout">
 
-    <div id="profileLoading">Betöltés...</div>
+    <!-- ✅ SIDEBAR -->
+    <aside class="sidebar">
+      <div class="side-card">
+        <h3>Profil</h3>
+        <p class="muted">Táncos statisztikák</p>
+      </div>
 
-    <div id="profileContainer" style="display:none">
+      <div class="side-card">
+        <h3>Megjelenés</h3>
+        <select id="themeSelector" style="width:100%">
+          <option value="light">☀️ Világos</option>
+          <option value="dark">🌙 Sötét</option>
+          <option value="rainbow">🌈 Szivárvány</option>
+        </select>
+      </div>
+    </aside>
 
-      <!-- ✅ PROFIL HEADER -->
-      <section class="profile-hero">
-        <div class="profile-avatar" id="profileInitials">?</div>
-        <h1 id="profileName"></h1>
-        <p id="profileDivision"></p>
+    <!-- ✅ MAIN -->
+    <main class="container">
 
-        <div style="margin-top:10px;">
-          <span id="profileWsdc"></span>
-          <a id="profileScoringLink" target="_blank">➔</a>
+      <div id="profileLoading" class="card">Betöltés...</div>
+
+      <div id="profileContainer" style="display:none">
+
+        <!-- HERO -->
+        <section class="profile-hero">
+          <div class="profile-avatar" id="profileInitials">?</div>
+          <h1 id="profileName"></h1>
+          <div class="profile-meta">
+            <span id="profileDivision"></span> • 
+            <span id="profileWsdc"></span>
+            <a id="profileScoringLink" target="_blank">WSDC</a>
+          </div>
+        </section>
+
+        <!-- CHART -->
+        <div class="card chart-card">
+          <canvas id="pointsChart"></canvas>
         </div>
-      </section>
 
-      <!-- ✅ CHART -->
-      <canvas id="pointsChart"></canvas>
-      <div id="chartTooltip" class="chart-tooltip"></div>
+        <!-- EVENTS -->
+        <div class="card events-card">
+          <div id="profileContent"></div>
+        </div>
 
-      <!-- ✅ ESEMÉNYEK -->
-      <div id="profileContent"></div>
+      </div>
 
-    </div>
-  </main>
+    </main>
+  </div>
 </div>
 
 <script type="module" src="../assets/js/main.js"></script>
