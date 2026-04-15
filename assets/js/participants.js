@@ -17,15 +17,13 @@ let activeRole = "Leader";
 let chartInstance = null;
 
 /* =========================
-   DATE PARSER (🔥 FIX)
+   DATE PARSER
 ========================= */
 function parseDateSafe(str) {
     const s = safeText(str);
     if (!s) return null;
 
-    // támogatja: 2026.05.09 / 2026-05-09
     const parts = s.replace(/\./g, "-").split("-").map(Number);
-
     if (parts.length < 3) return null;
 
     return new Date(parts[0], parts[1] - 1, parts[2]);
@@ -143,17 +141,21 @@ export async function loadProfileFromSheet() {
                 prelim: safeText(r[idx.prelim]),
                 semi: safeText(r[idx.semi]),
                 final: safeText(r[idx.final]),
-                point: Number(r[idx.point]) || 0,
+                point: (() => {
+                    const raw = safeText(r[idx.point]);
+                    const cleaned = raw.replace(",", ".").match(/-?\d+(\.\d+)?/);
+                    return cleaned ? parseFloat(cleaned[0]) : 0;
+                })(),
                 partner: safeText(r[idx.partner])
             }))
             .filter(r => r.event && r.date);
 
-        /* ========= ROLE FILTER ========= */
+        /* ========= ROLE FILTER + POINT FILTER 🔥 */
         const filtered = results.filter(r =>
             (r.role || "").toLowerCase() === activeRole.toLowerCase()
+            && r.point > 0
         );
 
-        /* ========= CHART ========= */
         renderChart(filtered);
 
         /* ========= GROUP ========= */
@@ -169,7 +171,6 @@ export async function loadProfileFromSheet() {
             return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
         });
 
-        /* ========= RENDER ========= */
         let html = `
             <div class="role-switch">
                 <button class="${activeRole === "Leader" ? "active" : ""}" onclick="setRole('Leader')">Leader</button>
@@ -180,29 +181,11 @@ export async function loadProfileFromSheet() {
         let i = 0;
 
         sortedDivisions.forEach(division => {
-            const events = grouped[division];
-
-            events.sort((a, b) => b.date - a.date);
+            const events = grouped[division].sort((a, b) => b.date - a.date);
 
             html += `<h2 class="division-title">${division}</h2>`;
 
             events.forEach(r => {
-                const placement = parseInt(r.final);
-                let badgeClass = "";
-
-                if (placement === 1) badgeClass = "gold";
-                else if (placement === 2) badgeClass = "silver";
-                else if (placement === 3) badgeClass = "bronze";
-
-                const role = (r.role || "").toLowerCase();
-
-                const fieldSize =
-                    role === "leader"
-                        ? r.leader
-                        : role === "follower"
-                        ? r.follower
-                        : null;
-
                 html += `
                     <div class="event-accordion-item">
                         <div class="event-header" onclick="toggleAccordion(${i})">
@@ -210,43 +193,21 @@ export async function loadProfileFromSheet() {
                                 <div class="event-name">${r.event}</div>
                                 <div class="event-date">${r.dateRaw}</div>
                             </div>
-
                             <div>
-                                <span class="res-badge ${badgeClass}">
-                                    ${r.final || "-"}
-                                </span>
-                                <span class="res-badge point">
-                                    +${r.point}
-                                </span>
+                                <span class="res-badge">${r.final || "-"}</span>
+                                <span class="res-badge point">+${r.point}</span>
                             </div>
                         </div>
-
                         <div class="event-body" id="acc-${i}">
                             <div class="details-grid">
                                 <div class="det">
-                                    <label>Mezőny</label>
-                                    <span>${fieldSize || "-"}</span>
-                                </div>
-
-                                <div class="det">
                                     <label>Partner</label>
                                     <span>${r.partner || "-"}</span>
-                                </div>
-
-                                <div class="det">
-                                    <label>Prelim</label>
-                                    <span>${r.prelim || "-"}</span>
-                                </div>
-
-                                <div class="det">
-                                    <label>Semi</label>
-                                    <span>${r.semi || "-"}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
-
                 i++;
             });
         });
@@ -262,7 +223,7 @@ export async function loadProfileFromSheet() {
 }
 
 /* =========================
-   CHART (FINAL CLEAN)
+   CHART (FIXED)
 ========================= */
 function renderChart(results) {
     const canvas = document.getElementById("pointsChart");
@@ -278,42 +239,24 @@ function renderChart(results) {
     };
 
     const byDivision = {};
-
     results.forEach(r => {
         if (!byDivision[r.division]) byDivision[r.division] = [];
         byDivision[r.division].push(r);
     });
 
-    const sortedDivisions = Object.keys(byDivision).sort((a, b) => {
-        const ai = DIVISION_ORDER.indexOf(a);
-        const bi = DIVISION_ORDER.indexOf(b);
-        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-    });
-
-    const datasets = sortedDivisions.map(division => {
+    const datasets = Object.keys(byDivision).map(division => {
         const events = byDivision[division].sort((a, b) => a.date - b.date);
 
         let cumulative = 0;
 
-        const data = events.map(e => {
-            cumulative += e.point;
-
-            return {
-                x: e.date,
-                y: cumulative,
-                event: e.event,
-                partner: e.partner
-            };
-        });
-
         return {
             label: division,
-            data,
+            data: events.map(e => {
+                cumulative += e.point;
+                return { x: e.date, y: cumulative };
+            }),
             borderColor: COLORS[division] || "#999",
-            backgroundColor: COLORS[division] || "#999",
-            tension: 0.4,
-            pointRadius: 5,
-            pointHoverRadius: 7
+            tension: 0.4
         };
     });
 
@@ -324,77 +267,18 @@ function renderChart(results) {
         data: { datasets },
         options: {
             parsing: false,
-            responsive: true,
-
-            interaction: {
-                mode: "nearest",
-                intersect: false
-            },
-
             plugins: {
-                legend: {
-                    position: "right"
-                },
-
-                tooltip: {
-                    enabled: false,
-                    external: function(context) {
-                        const tooltipEl = document.getElementById("chartTooltip");
-                        const tooltipModel = context.tooltip;
-
-                        if (tooltipModel.opacity === 0) {
-                            tooltipEl.classList.remove("active");
-                            return;
-                        }
-
-                        const point = tooltipModel.dataPoints[0].raw;
-
-                        tooltipEl.innerHTML = `
-                            <div class="title">${point.event}</div>
-                            <div class="row">
-                                <span>Dátum</span>
-                                <span>${point.x.toLocaleDateString("hu-HU")}</span>
-                            </div>
-                            <div class="row">
-                                <span>Pont</span>
-                                <span>${point.y}</span>
-                            </div>
-                            <div class="row">
-                                <span>Partner</span>
-                                <span>${point.partner || "-"}</span>
-                            </div>
-                        `;
-
-                        const { offsetLeft, offsetTop } = context.chart.canvas;
-
-                        tooltipEl.style.left =
-                            offsetLeft + tooltipModel.caretX + "px";
-                        tooltipEl.style.top =
-                            offsetTop + tooltipModel.caretY + "px";
-
-                        tooltipEl.classList.add("active");
-                    }
-                }
+                legend: { position: "right" }
             },
-
             scales: {
-                x: {
-                    type: "time",
-                    time: {
-                        unit: "month"
-                    }
-                },
-                y: {
-                    beginAtZero: true
-                }
+                x: { type: "time" },
+                y: { beginAtZero: true }
             }
         }
     });
 }
 
-/* =========================
-   ACTIONS
-========================= */
+/* ========================= */
 window.toggleAccordion = (i) => {
     document.getElementById(`acc-${i}`)?.classList.toggle("active");
 };
