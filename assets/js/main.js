@@ -3,32 +3,32 @@ import { loadParticipantsFromSheet, loadProfileFromSheet } from './participants.
 import { initCalendarPage } from './calendar.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
-    console.log("High Five Swing - App Initializing... 🚀");
-
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
 
     await initGlobalSidebar();
+    initSidebarToggle();
 
     if (document.getElementById("participants")) {
-        loadParticipantsFromSheet().catch(err => {
-            console.error("Hiba a résztvevők betöltésekor:", err);
-        });
+        loadParticipantsFromSheet();
     }
 
     if (document.getElementById("profileContent")) {
-        loadProfileFromSheet().catch(err => {
-            console.error("Hiba a profil betöltésekor:", err);
-        });
+        loadProfileFromSheet();
     }
 
     if (document.getElementById("calendar")) {
-        initCalendarPage().catch(err => {
-            console.error("Hiba a naptár inicializálásakor:", err);
-        });
+        initCalendarPage();
     }
-
-    window.addEventListener("unhandledrejection", (event) => {
-        console.warn("Nem kezelt hiba történt:", event.reason);
-    });
 });
+
+function initSidebarToggle() {
+    const btn = document.getElementById("sidebarToggle");
+    const sidebar = document.getElementById("calendarSidebar");
+
+    if (!btn || !sidebar) return;
+
+    btn.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+    });
+}
