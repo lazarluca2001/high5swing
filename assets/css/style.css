@@ -1,3 +1,6 @@
+/* =========================================
+   1. VÁLTOZÓK ÉS TÉMÁK
+   ========================================= */
 :root {
   --hfs-red: #800000;
   --hfs-red-hover: #a00000;
@@ -16,12 +19,14 @@
   --today-bg: #fff0f0;
   --status-biztos-border: #2e7d32;
   --status-talan-border: #ef6c00;
+  --empty-day-fill: #f9f9f9;
 }
 
 [data-theme="dark"] {
   --bg-color: #0a0a0a; --card-bg: #1a1a1a; --text-color: #f0f0f0;
   --text-muted: #aaaaaa; --border-color: #333333; --nav-bg: rgba(30, 30, 30, 0.9);
   --hfs-red: #ff4d4d; --hfs-light-red: #2d1a1a; --today-bg: #3d1010;
+  --empty-day-fill: #141414;
 }
 
 [data-theme="rainbow"] {
@@ -30,6 +35,9 @@
   --border-color: rgba(255, 255, 255, 0.18); --hfs-red: #ff9a1f;
 }
 
+/* =========================================
+   2. ALAPOK ÉS LAYOUT
+   ========================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-color); background: var(--bg-color); line-height: 1.5; transition: 0.3s; }
 .shell { max-width: 1680px; margin: 0 auto; padding: 28px; }
@@ -50,35 +58,66 @@ body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-colo
 .sidebar-head { padding: 20px; border-bottom: 1px solid var(--border-color); }
 .side-card { background: rgba(0,0,0,0.02); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin: 12px; }
 
-.card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px; text-decoration: none; display: block; }
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+/* =========================================
+   3. KÁRTYÁK ÉS GOMBOK
+   ========================================= */
+.card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px; text-decoration: none; display: block; transition: 0.2s; }
+.card:hover { transform: translateY(-4px); border-color: var(--hfs-red); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
 
-/* Calendar Specific */
-.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(130px, 1fr)); background: var(--border-color); gap: 1px; border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border-color); }
+.profile-button {
+  display: block; width: 100%; text-align: center; padding: 12px;
+  background: var(--hfs-light-red); color: var(--hfs-red);
+  border-radius: var(--radius-md); font-weight: 800; margin-top: 15px;
+}
+
+/* =========================================
+   4. NAPTÁR SPECIFIKUS
+   ========================================= */
+.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(130px, 1fr)); background: var(--border-color); gap: 1px; border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow); }
 .weekday { background: var(--hfs-red); color: white; height: 44px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; }
-.day { background: var(--card-bg); padding: 10px; min-height: 150px; display: flex; flex-direction: column; }
+.day { background: var(--card-bg); padding: 10px; min-height: 150px; display: flex; flex-direction: column; position: relative; }
 .day.today { background: var(--today-bg) !important; box-shadow: inset 0 0 0 2px var(--hfs-red); }
+.day-number { font-weight: 800; opacity: 0.4; margin-bottom: 8px; }
+.empty-day-pre, .empty-day-post { background: var(--empty-day-fill); }
+
 .event-card { background: color-mix(in srgb, var(--card-bg), var(--hfs-red) 5%); padding: 8px; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 8px; }
 .event-title { font-weight: 800; color: var(--hfs-red); font-size: 0.75rem; margin-bottom: 4px; }
-.person-tag { background: var(--card-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; border-left: 3px solid #ccc; margin: 1px; display: inline-flex; align-items: center; gap: 4px; }
+.person-tag { background: var(--card-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; border-left: 3px solid #ccc; margin: 1px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); }
 .status-biztos { border-left-color: var(--status-biztos-border); }
 .status-talan { border-left-color: var(--status-talan-border); }
 
-/* Profile Specific */
+/* Naptár vezérlők */
+.month-display-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 15px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); }
+.month-title-group { display: flex; align-items: center; gap: 20px; }
+.nav-btn, .today-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); cursor: pointer; font-weight: 700; }
+.nav-btn:hover { background: var(--hfs-light-red); color: var(--hfs-red); }
+
+/* =========================================
+   5. PROFIL ÉS STATISZTIKÁK
+   ========================================= */
 .profile-main-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 32px; }
 .profile-hero { text-align: center; padding: 40px; background: var(--card-bg); border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow); margin-bottom: 30px; }
-.profile-avatar { width: 100px; height: 100px; background: var(--hfs-red); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 900; margin: 0 auto 20px; }
+.profile-avatar { width: 100px; height: 100px; background: var(--hfs-red); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 900; margin: 0 auto 20px; box-shadow: 0 0 0 8px color-mix(in srgb, var(--hfs-red) 15%, transparent); }
 
-.event-accordion-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden; }
-.event-header { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.event-accordion-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.event-header { padding: 18px 22px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
 .event-body { max-height: 0; overflow: hidden; transition: 0.3s ease-in-out; background: rgba(0,0,0,0.03); }
 .event-body.active { max-height: 1000px; padding: 20px; border-top: 1px solid var(--border-color); }
 
-.stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+.stat-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+.stat-row:last-child { border-bottom: none; }
 .stat-row .val { color: var(--hfs-red); font-weight: 800; }
 
+.details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.det label { display: block; font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800; }
+.det span { font-weight: 800; font-size: 1.1rem; color: var(--hfs-red); }
+
+/* =========================================
+   6. RESPONSIVE
+   ========================================= */
 @media (max-width: 1024px) { 
-    .layout, .calendar-layout, .profile-main-grid { grid-template-columns: 1fr; } 
-    .sidebar { position: static; width: 100%; } 
-    .calendar-grid { grid-template-columns: repeat(7, 100px); overflow-x: auto; }
+  .layout, .calendar-layout, .profile-main-grid { grid-template-columns: 1fr; } 
+  .sidebar { position: static; width: 100%; margin-bottom: 24px; } 
+  .calendar-grid { grid-template-columns: repeat(7, 120px); overflow-x: auto; }
 }
