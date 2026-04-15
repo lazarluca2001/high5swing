@@ -299,7 +299,7 @@ function renderChart(results) {
             cumulative += e.point;
 
             return {
-                x: e.date,
+                x: e.date.toLocaleDateString("hu-HU")
                 y: cumulative,
                 event: e.event,
                 partner: e.partner
@@ -335,7 +335,7 @@ function renderChart(results) {
                 }
             },
             scales: {
-                x: { type: "time" },
+                x: { type: "category" },
                 y: { beginAtZero: true }
             }
         }
