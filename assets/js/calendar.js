@@ -25,7 +25,7 @@ export async function initCalendarPage() {
             return;
         }
 
-        const headers = rows[headerIndex].map(h => safeText(h));
+        const headers = rows[headerIndex].map(safeText);
         const eventIdx = headers.indexOf("Event");
 
         allEvents = rows
@@ -38,26 +38,29 @@ export async function initCalendarPage() {
                 e._startTs = parseCalendarDate(e["Start date"]);
                 e._endTs = parseCalendarDate(e["End date"]) || e._startTs;
 
-                e._participants = [];
+                e._participants = Object.entries(CAL_CONFIG.members)
+                    .map(([name, emoji]) => {
+                        const status = safeText(e[name]).toLowerCase();
+                        if (!CAL_CONFIG.validStatuses.includes(status)) return null;
 
-                Object.entries(CAL_CONFIG.members).forEach(([name, emoji]) => {
-                    const status = safeText(e[name]).toLowerCase();
-                    if (CAL_CONFIG.validStatuses.includes(status)) {
-                        e._participants.push({
+                        return {
                             name,
                             emoji,
                             statusClass: status.includes("talán")
                                 ? "status-talan"
                                 : "status-biztos"
-                        });
-                    }
-                });
+                        };
+                    })
+                    .filter(Boolean);
 
                 return e;
             })
             .filter(e => e._startTs);
 
         setupUI();
+        renderCalendar();
+        renderFilters();
+        renderStats();
 
     } catch (e) {
         console.error("Calendar init error:", e);
@@ -65,7 +68,7 @@ export async function initCalendarPage() {
 }
 
 /* =========================
-   UI SETUP
+   UI
 ========================= */
 function setupUI() {
     const sel = document.getElementById("monthSelect");
@@ -73,7 +76,6 @@ function setupUI() {
 
     if (!sel) return;
 
-    // hónap selector
     sel.innerHTML = CAL_CONFIG.months.map((m, i) =>
         `<option value="${i}" ${i === currentMonthIdx ? "selected" : ""}>${m}</option>`
     ).join("");
@@ -83,20 +85,14 @@ function setupUI() {
         renderCalendar();
     };
 
-    // filter click (delegation)
     if (filterBox) {
-        filterBox.addEventListener("click", (e) => {
+        filterBox.onclick = (e) => {
             const btn = e.target.closest("button");
             if (!btn) return;
-
-            const name = btn.dataset.name;
-            if (!name) return;
-
-            toggleFilter(name);
-        });
+            toggleFilter(btn.dataset.name);
+        };
     }
 
-    // HTML onclick miatt globál
     window.changeMonth = (d) => {
         currentMonthIdx = (currentMonthIdx + d + 12) % 12;
         sel.value = currentMonthIdx;
@@ -108,15 +104,8 @@ function setupUI() {
         sel.value = currentMonthIdx;
         renderCalendar();
     };
-
-    renderCalendar();
-    renderFilters();
-    renderStats();
 }
 
-/* =========================
-   FILTER
-========================= */
 function toggleFilter(name) {
     activeFilter = activeFilter === name ? null : name;
     renderCalendar();
@@ -124,7 +113,7 @@ function toggleFilter(name) {
 }
 
 /* =========================
-   CALENDAR RENDER
+   RENDER
 ========================= */
 function renderCalendar() {
     const cal = document.getElementById("calendar");
@@ -136,7 +125,6 @@ function renderCalendar() {
 
     const fragment = document.createDocumentFragment();
 
-    // weekdays
     CAL_CONFIG.weekdays.forEach(d => {
         const el = document.createElement("div");
         el.className = "weekday";
@@ -194,25 +182,17 @@ function renderCalendar() {
     cal.appendChild(fragment);
 }
 
-/* =========================
-   FILTER BUTTONS
-========================= */
 function renderFilters() {
     const box = document.getElementById("memberFilter");
     if (!box) return;
 
     box.innerHTML = Object.entries(CAL_CONFIG.members).map(([name, emoji]) => `
-        <button 
-            class="filter-btn ${activeFilter === name ? "active" : ""}"
-            data-name="${name}">
+        <button class="filter-btn ${activeFilter === name ? "active" : ""}" data-name="${name}">
             ${emoji} ${name}
         </button>
     `).join("");
 }
 
-/* =========================
-   STATS
-========================= */
 function renderStats() {
     const el = document.getElementById("activityChart");
     if (!el) return;
@@ -225,12 +205,12 @@ function renderStats() {
         });
     });
 
-    const sorted = Object.entries(stats).sort((a, b) => b[1] - a[1]);
-
-    el.innerHTML = sorted.map(([name, val]) => `
-        <div class="stat-bar-item">
-            <span>${name}</span>
-            <span class="stat-val">${val}</span>
-        </div>
-    `).join("");
+    el.innerHTML = Object.entries(stats)
+        .sort((a, b) => b[1] - a[1])
+        .map(([name, val]) => `
+            <div class="stat-bar-item">
+                <span>${name}</span>
+                <span class="stat-val">${val}</span>
+            </div>
+        `).join("");
 }
