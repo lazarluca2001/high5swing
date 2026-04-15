@@ -6,8 +6,8 @@ let activeFilter = null;
 let currentMonthIdx = new Date().getMonth();
 
 export async function initCalendarPage() {
-    const calGrid = document.getElementById("calendar");
-    if (!calGrid) return;
+    const cal = document.getElementById("calendar");
+    if (!cal) return;
 
     const res = await fetch(CSV_URLS.CALENDAR, { cache: "no-store" });
     const rows = parseCSV(await res.text());
@@ -41,22 +41,22 @@ export async function initCalendarPage() {
             return e;
         }).filter(e => e._startTs);
 
-    setupCalendarUI();
+    setupUI();
 }
 
-function setupCalendarUI() {
+function setupUI() {
     const sel = document.getElementById("monthSelect");
 
     sel.innerHTML = CAL_CONFIG.months.map((m, i) =>
         `<option value="${i}" ${i === currentMonthIdx ? "selected" : ""}>${m}</option>`
     ).join("");
 
-    sel.onchange = (e) => {
-        currentMonthIdx = parseInt(e.target.value);
+    sel.onchange = e => {
+        currentMonthIdx = +e.target.value;
         renderCalendar();
     };
 
-    window.changeMonth = (d) => {
+    window.changeMonth = d => {
         currentMonthIdx = (currentMonthIdx + d + 12) % 12;
         sel.value = currentMonthIdx;
         renderCalendar();
@@ -68,15 +68,15 @@ function setupCalendarUI() {
         renderCalendar();
     };
 
-    window.toggleFilter = (name) => {
+    window.toggleFilter = name => {
         activeFilter = activeFilter === name ? null : name;
         renderCalendar();
-        renderMemberFilter();
+        renderFilters();
     };
 
     renderCalendar();
-    renderMemberFilter();
-    renderActivityChart();
+    renderFilters();
+    renderStats();
 }
 
 function renderCalendar() {
@@ -97,8 +97,10 @@ function renderCalendar() {
         cal.innerHTML += `<div class="day empty"></div>`;
     }
 
+    const todayTs = new Date().setHours(0,0,0,0);
+
     for (let d = 1; d <= days; d++) {
-        const ts = new Date(year, currentMonthIdx, d).getTime();
+        const ts = new Date(year, currentMonthIdx, d).setHours(0,0,0,0);
 
         const events = allEvents.filter(e =>
             ts >= e._startTs && ts <= e._endTs
@@ -107,16 +109,17 @@ function renderCalendar() {
         );
 
         cal.innerHTML += `
-            <div class="day">
+            <div class="day ${ts === todayTs ? 'today' : ''}">
                 <div class="day-number">${d}</div>
+
                 ${events.map(e => `
                     <div class="event-card">
                         <div class="event-title">${e.Event}</div>
-                        ${e._participants.map(p =>
-                            `<span class="person-tag ${p.statusClass}">
+                        ${e._participants.map(p => `
+                            <span class="person-tag ${p.statusClass}">
                                 ${p.emoji} ${p.name}
-                            </span>`
-                        ).join("")}
+                            </span>
+                        `).join("")}
                     </div>
                 `).join("")}
             </div>
@@ -124,7 +127,7 @@ function renderCalendar() {
     }
 }
 
-function renderMemberFilter() {
+function renderFilters() {
     const box = document.getElementById("memberFilter");
 
     box.innerHTML = Object.entries(CAL_CONFIG.members).map(([name, emoji]) => `
@@ -135,7 +138,7 @@ function renderMemberFilter() {
     `).join("");
 }
 
-function renderActivityChart() {
+function renderStats() {
     const el = document.getElementById("activityChart");
 
     const stats = {};
