@@ -299,7 +299,7 @@ function renderChart(results) {
             cumulative += e.point;
 
             return {
-                x: e.date.toLocaleDateString("hu-HU"),
+                x: e.date,
                 y: cumulative,
                 event: e.event,
                 partner: e.partner
@@ -311,8 +311,9 @@ function renderChart(results) {
             data,
             borderColor: COLORS[division] || "#999",
             backgroundColor: COLORS[division] || "#999",
-            tension: 0.45,
-            pointRadius: 5
+            tension: 0.4,
+            pointRadius: 5,
+            pointHoverRadius: 7
         };
     });
 
@@ -323,20 +324,69 @@ function renderChart(results) {
         data: { datasets },
         options: {
             parsing: false,
+            responsive: true,
+
+            interaction: {
+                mode: "nearest",
+                intersect: false
+            },
+
             plugins: {
-                legend: { position: "right" },
+                legend: {
+                    position: "right"
+                },
+
                 tooltip: {
-                    callbacks: {
-                        label: ctx => {
-                            const d = ctx.raw;
-                            return `${ctx.dataset.label}: ${d.y} pont – ${d.event} (${d.partner})`;
+                    enabled: false,
+                    external: function(context) {
+                        const tooltipEl = document.getElementById("chartTooltip");
+                        const tooltipModel = context.tooltip;
+
+                        if (tooltipModel.opacity === 0) {
+                            tooltipEl.classList.remove("active");
+                            return;
                         }
+
+                        const point = tooltipModel.dataPoints[0].raw;
+
+                        tooltipEl.innerHTML = `
+                            <div class="title">${point.event}</div>
+                            <div class="row">
+                                <span>Dátum</span>
+                                <span>${point.x.toLocaleDateString("hu-HU")}</span>
+                            </div>
+                            <div class="row">
+                                <span>Pont</span>
+                                <span>${point.y}</span>
+                            </div>
+                            <div class="row">
+                                <span>Partner</span>
+                                <span>${point.partner || "-"}</span>
+                            </div>
+                        `;
+
+                        const { offsetLeft, offsetTop } = context.chart.canvas;
+
+                        tooltipEl.style.left =
+                            offsetLeft + tooltipModel.caretX + "px";
+                        tooltipEl.style.top =
+                            offsetTop + tooltipModel.caretY + "px";
+
+                        tooltipEl.classList.add("active");
                     }
                 }
             },
+
             scales: {
-                x: { type: "category" },
-                y: { beginAtZero: true }
+                x: {
+                    type: "time",
+                    time: {
+                        unit: "month"
+                    }
+                },
+                y: {
+                    beginAtZero: true
+                }
             }
         }
     });
