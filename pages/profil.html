@@ -6,7 +6,7 @@
   <title>Profil – High Five Swing</title>
   <link rel="stylesheet" href="../assets/css/style.css" />
   <style>
-    /* Profil specifikus stílusok */
+    /* Profil Hero stílusok */
     .profile-hero {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -32,73 +32,133 @@
       box-shadow: 0 0 0 8px color-mix(in srgb, var(--hfs-red) 15%, transparent);
     }
 
-    /* Versenyeredmények listája */
-    .results-section h3 {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-      font-weight: 800;
+    /* Kétoszlopos elrendezés */
+    .profile-main-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 32px;
+      align-items: start;
     }
 
-    .results-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .result-item {
+    /* Harmonika (Accordion) stílusok */
+    .event-accordion-item {
       background: var(--card-bg);
-      padding: 16px 20px;
-      border-radius: var(--radius-lg);
       border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .event-header {
+      padding: 16px 20px;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s ease;
+      transition: background 0.2s;
     }
 
-    .result-item:hover {
-      transform: translateX(4px);
-      border-color: var(--hfs-red);
+    .event-header:hover {
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    .result-info {
+    .event-main-data {
       display: flex;
       flex-direction: column;
-      gap: 4px;
     }
 
-    .result-event {
-      font-weight: 800;
-      font-size: 1.05rem;
-      color: var(--text-color);
-    }
-
-    .result-meta {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .result-place {
-      background: var(--hfs-red);
-      color: white;
-      padding: 6px 14px;
-      border-radius: 999px;
+    .event-name {
       font-weight: 900;
-      font-size: 0.9rem;
-      min-width: 80px;
-      text-align: center;
+      color: var(--text-color);
+      font-size: 1.1rem;
     }
+
+    .event-date {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .res-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 900;
+      margin-left: 8px;
+    }
+
+    .res-badge.final { background: var(--hfs-red); color: white; }
+    .res-badge.point { background: #2e7d32; color: white; }
+
+    .event-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.3s ease-in-out;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .event-body.active {
+      max-height: 500px;
+      padding: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .det label {
+      display: block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .det span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--hfs-red);
+    }
+
+    .det.full {
+      grid-column: span 2;
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+    }
+
+    /* Statisztika sorok (Jobb oldal) */
+    .stat-mini-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.85rem;
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row .name { font-weight: 700; }
+    .stat-row .val { color: var(--hfs-red); font-weight: 800; }
 
     #profileLoading {
       text-align: center;
       padding: 60px;
       font-weight: 700;
       color: var(--hfs-red);
+    }
+
+    @media (max-width: 1024px) {
+      .profile-main-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -151,16 +211,34 @@
             <p class="muted" id="profileDivision"></p>
             
             <div class="wsdc-row" style="justify-content: center; margin-top: 15px; display: flex; align-items: center; gap: 10px;">
-              <span id="profileWsdc"></span>
+              <span id="profileWsdc" style="font-weight: 800; opacity: 0.8;"></span>
               <a id="profileScoringLink" href="#" target="_blank" class="wsdc-link" title="Scoring profil">➔</a>
             </div>
           </section>
 
-          <section class="results-section">
-            <h3>Versenyeredmények</h3>
-            <div id="profileContent" class="results-list">
+          <div class="profile-main-grid">
+            
+            <section class="results-section">
+              <div class="sidebar-title" style="margin-bottom: 16px;">Események</div>
+              <div id="profileContent" class="accordion-container">
+                </div>
+            </section>
+
+            <aside class="stats-column">
+              <div class="side-card">
+                <h3>Legsikeresebb versenyek</h3>
+                <div id="topEvents" class="stat-mini-list">
+                  </div>
               </div>
-          </section>
+
+              <div class="side-card" style="margin-top: 20px;">
+                <h3>Legjobb partnerek</h3>
+                <div id="topPartners" class="stat-mini-list">
+                  </div>
+              </div>
+            </aside>
+
+          </div>
         </div>
       </main>
     </div>
