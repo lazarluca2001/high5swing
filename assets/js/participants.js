@@ -28,64 +28,24 @@ export async function loadParticipantsFromSheet() {
     const root = document.getElementById("participants");
     if (!root) return;
 
-    root.innerHTML = "Betöltés...";
-
-    const rows = await fetchCSV("PARTICIPANTS");
-    const people = extractPeople(rows);
-
-    root.innerHTML = people.map(p => `
-        <div class="card">
-            <h2>${p.name}</h2>
-            <p>${p.division}</p>
-            <a href="./profil.html?id=${p.wsdcId}">Profil</a>
-        </div>
-    `).join("");
-}
-
-export async function loadProfileFromSheet() {
-    const container = document.getElementById("profileContainer");
-    const loading = document.getElementById("profileLoading");
-    const content = document.getElementById("profileContent");
-
-    if (!container || !loading || !content) return;
-
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-
-    if (!id) {
-        loading.innerHTML = "Hiányzó ID.";
-        return;
-    }
+    root.innerHTML = `<div class="card">Betöltés...</div>`;
 
     try {
         const rows = await fetchCSV("PARTICIPANTS");
         const people = extractPeople(rows);
 
-        const person = people.find(p => p.wsdcId === id);
-
-        if (!person) {
-            loading.innerHTML = "Nincs ilyen profil.";
-            return;
-        }
-
-        document.getElementById("profileName").innerText = person.name;
-        document.getElementById("profileDivision").innerText = person.division;
-        document.getElementById("profileWsdc").innerText = person.wsdcId;
-
-        document.getElementById("profileInitials").innerText =
-            person.name.split(" ").map(n => n[0]).join("");
-
-        content.innerHTML = `
+        root.innerHTML = people.map(p => `
             <div class="card">
-                Esemény adatok hamarosan...
+                <h2>${p.name}</h2>
+                <p>${p.division || "—"}</p>
+                <a href="./profil.html?id=${encodeURIComponent(p.wsdcId)}">
+                    Profil
+                </a>
             </div>
-        `;
-
-        loading.style.display = "none";
-        container.style.display = "block";
+        `).join("");
 
     } catch (e) {
-        console.error("Profile load error:", e);
-        loading.innerHTML = "Hiba történt.";
+        console.error(e);
+        root.innerHTML = `<div class="card">Hiba történt</div>`;
     }
 }
