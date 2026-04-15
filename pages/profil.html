@@ -7,12 +7,36 @@
 
   <link rel="stylesheet" href="../assets/css/style.css" />
 
-  <!-- ✅ Chart.js ide -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
+    .profile-hero {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--hfs-red);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 2rem;
+      margin: 0 auto 12px;
+    }
+
     .chart-tooltip {
-      position: absolute;
+      position: fixed; /* 🔥 fontos */
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       padding: 10px;
@@ -32,12 +56,6 @@
       font-weight: 800;
       margin-bottom: 6px;
     }
-
-    .chart-tooltip .row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
   </style>
 </head>
 
@@ -54,12 +72,23 @@
 
     <div id="profileContainer" style="display:none">
 
-      <h1 id="profileName"></h1>
+      <!-- ✅ PROFIL HEADER -->
+      <section class="profile-hero">
+        <div class="profile-avatar" id="profileInitials">?</div>
+        <h1 id="profileName"></h1>
+        <p id="profileDivision"></p>
+
+        <div style="margin-top:10px;">
+          <span id="profileWsdc"></span>
+          <a id="profileScoringLink" target="_blank">➔</a>
+        </div>
+      </section>
 
       <!-- ✅ CHART -->
       <canvas id="pointsChart" height="120"></canvas>
       <div id="chartTooltip" class="chart-tooltip"></div>
 
+      <!-- ✅ ESEMÉNYEK -->
       <div id="profileContent"></div>
 
     </div>
