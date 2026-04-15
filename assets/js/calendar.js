@@ -1,5 +1,6 @@
-import { CSV_URLS, CAL_CONFIG } from './config.js';
-import { parseCSV, safeText, parseCalendarDate } from './utils.js';
+import { fetchCSV } from "./api.js";
+
+const rows = await fetchCSV("CALENDAR");
 
 let allEvents = [];
 let activeFilter = null;
