@@ -1,5 +1,5 @@
 /* =========================================
-   1. VÁLTOZÓK ÉS TÉMÁK
+   1. VÁLTOZÓK ÉS TÉMÁK (DARK, RAINBOW)
    ========================================= */
 :root {
   --hfs-red: #800000;
@@ -16,6 +16,16 @@
   --radius-lg: 14px;
   --radius-md: 12px;
   --sidebar-w: 320px;
+
+  /* Naptár specifikus színek */
+  --empty-day-fill: #f9f9f9;
+  --empty-dots: #e0e0e0;
+  --status-biztos-bg: #ffffff;
+  --event-card-bg: #fff5f5;
+  --event-card-border: #f0d0d0;
+  --today-bg: #fff0f0;
+  --status-biztos-border: #2e7d32;
+  --status-talan-border: #ef6c00;
 }
 
 [data-theme="dark"] {
@@ -28,6 +38,9 @@
   --hfs-red: #ff4d4d;
   --hfs-red-hover: #ff7a7a;
   --hfs-light-red: #2d1a1a;
+  --empty-day-fill: #1a1a1a;
+  --empty-dots: #333333;
+  --today-bg: #3d1010;
 }
 
 [data-theme="rainbow"] {
@@ -37,6 +50,7 @@
   --card-bg: rgba(255, 255, 255, 0.08);
   --text-color: #ffffff;
   --border-color: rgba(255, 255, 255, 0.18);
+  --nav-bg: rgba(18, 8, 42, 0.86);
   --rainbow-red: #ff4b4b;
   --rainbow-orange: #ff9a1f;
   --rainbow-yellow: #ffd93d;
@@ -47,10 +61,9 @@
 }
 
 /* =========================================
-   2. ALAP BEÁLLÍTÁSOK
+   2. ALAPOK ÉS RESET
    ========================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
   font-family: system-ui, -apple-system, sans-serif;
   color: var(--text-color);
@@ -58,117 +71,134 @@ body {
   line-height: 1.5;
   transition: background 0.3s, color 0.3s;
 }
-
 a { color: inherit; text-decoration: none; }
 .muted { color: var(--text-muted); }
+.tiny { font-size: 0.75rem; }
 
 /* =========================================
-   3. ELRENDEZÉS (LAYOUT)
+   3. GLOBÁLIS ELRENDEZÉS (SHELL, TOPBAR)
    ========================================= */
-.shell { max-width: 1400px; margin: 0 auto; padding: 28px; }
+.shell { max-width: 1680px; margin: 0 auto; padding: 28px; }
 
-.layout {
-  display: grid;
-  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
-  gap: 32px;
-}
-
-/* Header & Nav */
 .topbar {
   position: sticky; top: 0; z-index: 1000;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 20px;
-  background: var(--nav-bg);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 20px; background: var(--nav-bg);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
+}
+
+.brand { font-weight: 900; display: flex; align-items: center; gap: 8px; }
+.brand::before {
+  content: ""; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--hfs-red); box-shadow: 0 0 0 5px color-mix(in srgb, var(--hfs-red) 20%, transparent);
 }
 
 .nav { display: flex; gap: 8px; }
-.nav a {
-  padding: 8px 16px; border-radius: 999px;
-  font-weight: 600; color: var(--text-muted);
-}
+.nav a { padding: 8px 16px; border-radius: 999px; font-weight: 600; color: var(--text-muted); transition: 0.2s; }
 .nav a.active { background: var(--hfs-red); color: white; }
+.nav a:hover:not(.active) { background: var(--hfs-light-red); color: var(--hfs-red); }
 
-/* Sidebar */
-.sidebar { position: sticky; top: 92px; height: fit-content; }
-.sidebar-head { padding: 22px; border-bottom: 1px solid var(--border-color); }
-.sidebar-title { font-weight: 900; font-size: 1.1rem; }
-.side-card { 
-  background: var(--card-bg); 
-  padding: 18px; border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color); margin-bottom: 15px;
-}
-
-/* =========================================
-   4. KOMPONENSEK (CARDS, ACCORDION)
-   ========================================= */
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  box-shadow: var(--shadow);
-}
-
-/* Harmonika / Accordion */
-.event-accordion-item {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-
-.event-header {
-  padding: 16px 20px; cursor: pointer;
-  display: flex; justify-content: space-between; align-items: center;
-}
-
-.event-body {
-  max-height: 0; overflow: hidden;
-  transition: all 0.3s ease-in-out;
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.event-body.active { max-height: 500px; padding: 20px; border-top: 1px solid var(--border-color); }
-
-/* Badges */
-.res-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 900; }
-.res-badge.final { background: var(--hfs-red); color: white; }
-.res-badge.point { background: #2e7d32; color: white; }
-
-/* =========================================
-   5. PROFIL SPECIFIKUS
-   ========================================= */
-.profile-main-grid {
+/* Rács elrendezések */
+.layout, .calendar-layout {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
   gap: 32px;
+  align-items: start;
+}
+
+/* =========================================
+   4. SIDEBAR ÉS KOMPONENSEK
+   ========================================= */
+.sidebar {
+  position: sticky; top: 92px; background: var(--card-bg);
+  border: 1px solid var(--border-color); border-radius: var(--radius-xl);
+  box-shadow: var(--shadow); overflow: hidden; backdrop-filter: blur(12px);
+}
+
+.sidebar-head { padding: 22px 24px; border-bottom: 1px solid var(--border-color); }
+.sidebar-title { font-weight: 900; font-size: 1.1rem; }
+.sidebar-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+.side-card {
+  background: color-mix(in srgb, var(--card-bg) 96%, var(--hfs-red));
+  padding: 18px; border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--hfs-red) 10%, var(--border-color));
+  margin: 14px;
+}
+
+.side-link {
+  display: flex; align-items: center; padding: 12px;
+  border-radius: var(--radius-md); font-weight: 700; transition: 0.2s;
+}
+.side-link:hover { background: var(--hfs-light-red); color: var(--hfs-red); }
+
+/* =========================================
+   5. PROFIL OLDAL SPECIFIKUS
+   ========================================= */
+.profile-hero {
+  text-align: center; padding: 40px 20px; background: var(--card-bg);
+  border-radius: var(--radius-xl); border: 1px solid var(--border-color);
+  margin-bottom: 24px; box-shadow: var(--shadow);
 }
 
 .profile-avatar {
-  width: 100px; height: 100px;
-  background: var(--hfs-red); color: white;
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  font-size: 2.5rem; font-weight: 900; margin: 0 auto 20px;
+  width: 100px; height: 100px; background: var(--hfs-red);
+  color: white; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-size: 2.5rem;
+  font-weight: 900; margin: 0 auto 16px; border: 2px solid var(--hfs-red);
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--hfs-red) 15%, transparent);
 }
 
-.stat-row {
-  display: flex; justify-content: space-between;
-  padding: 12px 0; border-bottom: 1px solid var(--border-color);
+.profile-main-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 32px; }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px; margin-top: 24px;
 }
-.stat-row .val { color: var(--hfs-red); font-weight: 800; }
+
+.stat-card {
+  background: var(--card-bg); padding: 20px; border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color); text-align: center;
+}
+
+.stat-value { font-size: 1.5rem; font-weight: 800; color: var(--hfs-red); display: block; }
+.stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* Harmonika (Accordion) */
+.event-accordion-item {
+  background: var(--card-bg); border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden;
+}
+.event-header { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.event-body { max-height: 0; overflow: hidden; transition: all 0.3s ease-in-out; background: rgba(0,0,0,0.05); }
+.event-body.active { max-height: 500px; padding: 20px; border-top: 1px solid var(--border-color); }
 
 /* =========================================
-   6. RESPONSIVE
+   6. NAPTÁR ÉS EREDMÉNYEK
+   ========================================= */
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, minmax(140px, 1fr));
+  background: var(--border-color); gap: 1px; width: 100%;
+}
+.weekday { background: var(--hfs-red); color: white; height: 42px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+.day { background: var(--card-bg); padding: 10px; min-height: 150px; position: relative; }
+.day.today { background: var(--today-bg) !important; box-shadow: inset 0 0 0 2px var(--hfs-red); }
+
+.res-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 900; }
+.res-badge.final { background: var(--hfs-red); color: white; }
+.res-badge.point { background: var(--status-biztos-border); color: white; }
+
+/* =========================================
+   7. RESPONSIVE DESIGN
    ========================================= */
 @media (max-width: 1024px) {
-  .layout, .profile-main-grid { grid-template-columns: 1fr; }
-  .sidebar { position: static; }
+  .layout, .calendar-layout, .profile-main-grid { grid-template-columns: 1fr; }
+  .sidebar { position: static; width: 100%; margin-bottom: 24px; }
+  .calendar-grid { grid-template-columns: repeat(7, 120px); overflow-x: auto; }
 }
 
 @media (max-width: 600px) {
-  .shell { padding: 15px; }
-  .topbar { flex-direction: column; gap: 10px; }
+  .topbar { flex-direction: column; gap: 12px; }
+  .nav { width: 100%; justify-content: center; font-size: 0.85rem; }
+  .shell { padding: 14px; }
 }
