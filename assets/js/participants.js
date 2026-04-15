@@ -2,7 +2,7 @@ import { fetchCSV } from "./api.js";
 import { safeText } from "./utils.js";
 
 /* =========================
-   SEGÉD: PEOPLE
+   PEOPLE
 ========================= */
 function extractPeople(rows) {
     const headerIndex = rows.findIndex(r =>
@@ -16,8 +16,6 @@ function extractPeople(rows) {
     const nameIdx = headers.indexOf("name");
     const divisionIdx = headers.indexOf("division");
     const wsdcIdx = headers.indexOf("wsdc id");
-
-    if (nameIdx === -1 || wsdcIdx === -1) return [];
 
     return rows
         .slice(headerIndex + 1)
@@ -38,33 +36,22 @@ export async function loadParticipantsFromSheet() {
 
     root.innerHTML = `<div class="card">Betöltés...</div>`;
 
-    try {
-        const rows = await fetchCSV("PARTICIPANTS");
-        const people = extractPeople(rows);
+    const rows = await fetchCSV("PARTICIPANTS");
+    const people = extractPeople(rows);
 
-        if (!people.length) {
-            root.innerHTML = `<div class="card">Nincs adat</div>`;
-            return;
-        }
-
-        root.innerHTML = people.map(p => `
-            <div class="card">
-                <h2>${p.name}</h2>
-                <p>${p.division || "—"}</p>
-                <a href="./profil.html?id=${encodeURIComponent(p.wsdcId)}">
-                    Profil
-                </a>
-            </div>
-        `).join("");
-
-    } catch (e) {
-        console.error(e);
-        root.innerHTML = `<div class="card">Hiba történt</div>`;
-    }
+    root.innerHTML = people.map(p => `
+        <div class="card">
+            <h2>${p.name}</h2>
+            <p>${p.division || "—"}</p>
+            <a href="./profil.html?id=${encodeURIComponent(p.wsdcId)}">
+                Profil
+            </a>
+        </div>
+    `).join("");
 }
 
 /* =========================
-   PROFIL + RESULTS
+   PROFIL
 ========================= */
 export async function loadProfileFromSheet() {
     const container = document.getElementById("profileContainer");
@@ -81,20 +68,15 @@ export async function loadProfileFromSheet() {
     }
 
     try {
-        /* ========= PARTICIPANTS ========= */
+        /* ========= PERSON ========= */
         const rows = await fetchCSV("PARTICIPANTS");
         const people = extractPeople(rows);
 
         const person = people.find(p => p.wsdcId === id);
+        if (!person) return;
 
-        if (!person) {
-            loading.innerHTML = "Nincs ilyen profil.";
-            return;
-        }
-
-        // HERO
         document.getElementById("profileName").innerText = person.name;
-        document.getElementById("profileDivision").innerText = person.division || "—";
+        document.getElementById("profileDivision").innerText = person.division;
         document.getElementById("profileWsdc").innerText = person.wsdcId;
         document.getElementById("profileInitials").innerText =
             person.name.split(" ").map(n => n[0]).join("");
@@ -106,80 +88,128 @@ export async function loadProfileFromSheet() {
             r.some(c => safeText(c).toLowerCase() === "name")
         );
 
-        if (headerIndex === -1) {
-            content.innerHTML = `<div class="card">Nincs eredmény adat</div>`;
-            return;
-        }
-
         const headers = resultRows[headerIndex].map(h => safeText(h).toLowerCase());
-        const getIdx = (name) => headers.indexOf(name.toLowerCase());
+        const get = (n) => headers.indexOf(n);
 
-        const nameIdx = getIdx("name");
-        const eventIdx = getIdx("event");
-        const dateIdx = getIdx("date");
-        const prelimIdx = getIdx("prelim");
-        const semiIdx = getIdx("semi");
-        const finalIdx = getIdx("final");
-        const pointIdx = getIdx("point");
-        const partnerIdx = getIdx("partner");
+        const idx = {
+            name: get("name"),
+            division: get("division"),
+            event: get("event"),
+            date: get("date"),
+            role: get("role"),
+            leader: get("leader"),
+            follower: get("follower"),
+            prelim: get("prelim"),
+            semi: get("semi"),
+            final: get("final"),
+            point: get("point"),
+            partner: get("partner")
+        };
 
         let results = resultRows
             .slice(headerIndex + 1)
-            .filter(r => safeText(r[nameIdx]) === person.name)
+            .filter(r => safeText(r[idx.name]) === person.name)
             .map(r => ({
-                event: safeText(r[eventIdx]),
-                date: safeText(r[dateIdx]),
-                prelim: safeText(r[prelimIdx]),
-                semi: safeText(r[semiIdx]),
-                final: safeText(r[finalIdx]),
-                points: safeText(r[pointIdx]),
-                partner: safeText(r[partnerIdx])
+                division: safeText(r[idx.division]),
+                role: safeText(r[idx.role]),
+                event: safeText(r[idx.event]),
+                date: safeText(r[idx.date]),
+                leader: safeText(r[idx.leader]),
+                follower: safeText(r[idx.follower]),
+                prelim: safeText(r[idx.prelim]),
+                semi: safeText(r[idx.semi]),
+                final: safeText(r[idx.final]),
+                point: safeText(r[idx.point]),
+                partner: safeText(r[idx.partner])
             }))
             .filter(r => r.event);
 
-        // dátum szerint csökkenő
-        results.sort((a, b) => new Date(b.date) - new Date(a.date));
+        /* ========= GROUP ========= */
+        const grouped = {};
 
-        /* ========= UI ========= */
-        if (!results.length) {
-            content.innerHTML = `<div class="card">Nincs még verseny eredmény</div>`;
-        } else {
-            content.innerHTML = results.map((r, i) => `
-                <div class="event-accordion-item">
-                    <div class="event-header" onclick="toggleAccordion(${i})">
-                        <div class="event-main-data">
-                            <div class="event-name">${r.event}</div>
-                            <div class="event-date">${r.date}</div>
-                        </div>
-                        <div>
-                            <span class="res-badge">${r.final || "-"}</span>
-                            <span class="res-badge point">+${r.points || 0}</span>
-                        </div>
-                    </div>
+        results.forEach(r => {
+            if (!grouped[r.division]) grouped[r.division] = {};
+            if (!grouped[r.division][r.role]) grouped[r.division][r.role] = [];
 
-                    <div class="event-body" id="acc-${i}">
-                        <div class="details-grid">
-                            <div class="det">
-                                <label>Prelim</label>
-                                <span>${r.prelim || "-"}</span>
+            grouped[r.division][r.role].push(r);
+        });
+
+        /* ========= RENDER ========= */
+        let html = "";
+        let i = 0;
+
+        Object.entries(grouped).forEach(([division, roles]) => {
+            html += `<h2 style="margin-top:20px;">${division}</h2>`;
+
+            Object.entries(roles).forEach(([role, events]) => {
+                html += `<h3 style="opacity:.7">${role}</h3>`;
+
+                events.forEach(r => {
+                    const placement = parseInt(r.final);
+                    let badgeClass = "";
+
+                    if (placement === 1) badgeClass = "gold";
+                    else if (placement === 2) badgeClass = "silver";
+                    else if (placement === 3) badgeClass = "bronze";
+
+                    html += `
+                        <div class="event-accordion-item">
+                            <div class="event-header" onclick="toggleAccordion(${i})">
+                                <div>
+                                    <div class="event-name">${r.event}</div>
+                                    <div class="event-date">${r.date}</div>
+                                </div>
+
+                                <div>
+                                    <span class="res-badge ${badgeClass}">
+                                        ${r.final || "-"}
+                                    </span>
+                                    <span class="res-badge point">
+                                        +${r.point || 0}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="det">
-                                <label>Semi</label>
-                                <span>${r.semi || "-"}</span>
-                            </div>
-                            <div class="det">
-                                <label>Final</label>
-                                <span>${r.final || "-"}</span>
-                            </div>
-                            <div class="det full">
-                                <label>Partner</label>
-                                <span>${r.partner || "-"}</span>
+
+                            <div class="event-body" id="acc-${i}">
+                                <div class="details-grid">
+
+                                    <div class="det">
+                                        <label>Mezőny</label>
+                                        <span>
+                                           ${
+                                               r.role.toLowerCase() === "leader"
+                                                   ? (r.leader || "-")
+                                                   : (r.follower || "-")
+                                           }
+                                       </span>
+                                    </div>
+
+                                    <div class="det">
+                                        <label>Partner</label>
+                                        <span>${r.partner || "-"}</span>
+                                    </div>
+
+                                    <div class="det">
+                                        <label>Prelim</label>
+                                        <span>${r.prelim || "-"}</span>
+                                    </div>
+
+                                    <div class="det">
+                                        <label>Semi</label>
+                                        <span>${r.semi || "-"}</span>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            `).join("");
-        }
+                    `;
+
+                    i++;
+                });
+            });
+        });
+
+        content.innerHTML = html;
 
         loading.style.display = "none";
         container.style.display = "block";
@@ -196,6 +226,5 @@ export async function loadProfileFromSheet() {
 window.toggleAccordion = (i) => {
     const el = document.getElementById(`acc-${i}`);
     if (!el) return;
-
     el.classList.toggle("active");
 };
