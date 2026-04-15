@@ -28,16 +28,12 @@ function extractPeople(rows) {
 
     const headers = rows[headerIndex].map(h => safeText(h).toLowerCase());
 
-    const nameIdx = headers.indexOf("name");
-    const divisionIdx = headers.indexOf("division");
-    const wsdcIdx = headers.indexOf("wsdc id");
-
     return rows
         .slice(headerIndex + 1)
         .map(r => ({
-            name: safeText(r[nameIdx]),
-            division: safeText(r[divisionIdx]),
-            wsdcId: safeText(r[wsdcIdx])
+            name: safeText(r[headers.indexOf("name")]),
+            division: safeText(r[headers.indexOf("division")]),
+            wsdcId: safeText(r[headers.indexOf("wsdc id")])
         }))
         .filter(p => p.name && p.wsdcId);
 }
@@ -98,10 +94,7 @@ export async function loadProfileFromSheet() {
             r.some(c => safeText(c).toLowerCase() === "name")
         );
 
-        if (headerIndex === -1) {
-            content.innerHTML = `<div class="card">Nincs adat</div>`;
-            return;
-        }
+        if (headerIndex === -1) return;
 
         const headers = resultRows[headerIndex].map(h => safeText(h).toLowerCase());
         const get = (n) => headers.indexOf(n);
@@ -154,7 +147,6 @@ export async function loadProfileFromSheet() {
             grouped[r.division].push(r);
         });
 
-        /* ========= DIVISION SORT ========= */
         const sortedDivisions = Object.keys(grouped).sort((a, b) => {
             const ai = DIVISION_ORDER.indexOf(a);
             const bi = DIVISION_ORDER.indexOf(b);
@@ -174,7 +166,6 @@ export async function loadProfileFromSheet() {
         sortedDivisions.forEach(division => {
             const events = grouped[division];
 
-            // FRISS → RÉGI
             events.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             html += `<h2 class="division-title">${division}</h2>`;
@@ -216,7 +207,6 @@ export async function loadProfileFromSheet() {
 
                         <div class="event-body" id="acc-${i}">
                             <div class="details-grid">
-
                                 <div class="det">
                                     <label>Mezőny</label>
                                     <span>${fieldSize || "-"}</span>
@@ -236,7 +226,6 @@ export async function loadProfileFromSheet() {
                                     <label>Semi</label>
                                     <span>${r.semi || "-"}</span>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -253,46 +242,78 @@ export async function loadProfileFromSheet() {
 
     } catch (e) {
         console.error(e);
-        loading.innerHTML = "Hiba történt.";
     }
 }
 
 /* =========================
-   CHART
+   CHART (MULTI LINE)
 ========================= */
 function renderChart(results) {
     const canvas = document.getElementById("pointsChart");
     if (!canvas) return;
 
-    const sorted = [...results].sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
-    );
+    const allDates = [...new Set(results.map(r => r.date))]
+        .sort((a, b) => new Date(a) - new Date(b));
 
-    const labels = sorted.map(r => r.date);
-    const data = sorted.map(r => Number(r.point) || 0);
+    const byDivision = {};
+    results.forEach(r => {
+        if (!byDivision[r.division]) byDivision[r.division] = [];
+        byDivision[r.division].push(r);
+    });
 
-    let cumulative = [];
-    data.reduce((sum, val, i) => {
-        cumulative[i] = sum + val;
-        return cumulative[i];
-    }, 0);
+    const COLORS = [
+        "#e53935",
+        "#8e24aa",
+        "#3949ab",
+        "#00897b",
+        "#fdd835",
+        "#fb8c00"
+    ];
+
+    let colorIndex = 0;
+
+    const datasets = Object.entries(byDivision).map(([division, events]) => {
+        events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        let cumulative = 0;
+
+        const data = allDates.map(date => {
+            events
+                .filter(e => e.date === date)
+                .forEach(e => {
+                    cumulative += Number(e.point) || 0;
+                });
+
+            return cumulative;
+        });
+
+        return {
+            label: division,
+            data,
+            borderColor: COLORS[colorIndex++ % COLORS.length],
+            tension: 0.3
+        };
+    });
 
     if (chartInstance) chartInstance.destroy();
 
     chartInstance = new Chart(canvas, {
         type: "line",
         data: {
-            labels,
-            datasets: [{
-                label: "Pontok (kumulált)",
-                data: cumulative,
-                tension: 0.3
-            }]
+            labels: allDates,
+            datasets
         },
         options: {
             responsive: true,
+            plugins: {
+                legend: {
+                    position: "right"
+                }
+            },
             scales: {
-                y: { beginAtZero: true }
+                y: {
+                    beginAtZero: true
+                }
             }
         }
     });
