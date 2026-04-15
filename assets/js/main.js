@@ -10,14 +10,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         await initGlobalSidebar();
         initSidebarToggle();
 
+        // Résztvevők lista
         if (document.getElementById("participants")) {
             await loadParticipantsFromSheet();
         }
 
+        // Profil oldal
         if (document.getElementById("profileContent")) {
             await loadProfileFromSheet();
         }
 
+        // Naptár oldal
         if (document.getElementById("calendar")) {
             await initCalendarPage();
         }
