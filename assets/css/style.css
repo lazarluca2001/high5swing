@@ -91,7 +91,12 @@ body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-colo
     padding: 24px;
     margin-bottom: 20px;
     box-shadow: var(--shadow);
-    transition: transform 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.calendar-page .side-card:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: var(--shadow), 0 10px 20px rgba(0,0,0,0.05);
 }
 
 .calendar-page .side-card h3 {
@@ -103,27 +108,65 @@ body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-colo
     font-weight: 900;
 }
 
-/* Következő állomás belső design */
+/* --- KÖVETKEZŐ ÁLLOMÁS KÁRTYA TARTALMA --- */
 .calendar-page .next-event-content {
     background: var(--hfs-light-red);
-    padding: 15px;
+    padding: 18px;
     border-radius: var(--radius-md);
     border-left: 5px solid var(--hfs-red);
-    font-weight: 700;
-    font-size: 0.95rem;
+    box-shadow: inset 0 0 10px rgba(128, 0, 0, 0.05);
 }
 
-/* Aktivitás statisztika sorok */
-.calendar-page .stat-bar-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border-color);
+.calendar-page .next-event-title {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--hfs-red);
+    line-height: 1.2;
+    margin-bottom: 8px;
+}
+
+.calendar-page .next-event-date {
     font-size: 0.9rem;
     font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
-.calendar-page .stat-val {
-    color: var(--hfs-red);
+
+.calendar-page .next-event-date::before {
+    content: "📅";
+    font-size: 0.8rem;
+}
+
+.calendar-page .next-event-countdown {
+    display: inline-block;
+    background: var(--hfs-red);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 5px rgba(128, 0, 0, 0.2);
+}
+
+/* --- AKTIVITÁS ÉS STATISZTIKA --- */
+.calendar-page .activity-chart-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Egy kis vizuális extra az aktivitáshoz, ha később bővíted */
+.calendar-page .activity-chart-container::before {
+    content: "2026-os részvételi adatok";
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
 /* --- EGYEDI LENYÍLÓ LISTÁK (SELECT) --- */
@@ -150,6 +193,21 @@ body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-colo
 .calendar-page select:hover {
     border-color: var(--hfs-red);
     transform: translateY(-2px);
+}
+
+/* RAINBOW TÉMA KIEGÉSZÍTÉS */
+[data-theme="rainbow"] .calendar-page .next-event-content {
+    background: rgba(255, 255, 255, 0.05);
+    border-left-color: #ff9a1f;
+    backdrop-filter: blur(5px);
+}
+
+[data-theme="rainbow"] .calendar-page .next-event-title {
+    color: #ff9a1f;
+}
+
+[data-theme="rainbow"] .calendar-page .next-event-countdown {
+    background: linear-gradient(45deg, #ff9a1f, #ff4d4d);
 }
 
 /* --- NAPTÁR FEJLÉC ÉS NAVIGÁCIÓ --- */
@@ -249,9 +307,13 @@ body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-colo
 .profile-main-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 32px; }
 .profile-hero { text-align: center; padding: 40px; background: var(--card-bg); border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow); margin-bottom: 30px; }
 
-@media (max-width: 1024px) { 
-  .calendar-page .calendar-layout { grid-template-columns: 1fr; }
-  .calendar-page .calendar-grid { grid-template-columns: repeat(7, 140px); overflow-x: auto; }
+@media (max-width: 1024px) {
+    .calendar-page .calendar-layout { grid-template-columns: 1fr; }
+    .calendar-page .sidebar { position: static; width: 100%; margin-bottom: 24px; order: 2; }
+    .calendar-page .calendar-grid { 
+        grid-template-columns: repeat(7, 140px); /* Ez biztosítja a kényelmes mobil görgetést */
+        overflow-x: auto; 
+    }
 }
 
 /* =========================================
