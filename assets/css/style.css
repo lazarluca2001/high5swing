@@ -458,6 +458,74 @@ button {
   color: var(--hfs-red);
 }
 
+/* =========================
+   EVENT ACCORDION
+========================= */
+
+.event-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.event-card:hover {
+  border-color: var(--hfs-red);
+  box-shadow: var(--shadow);
+}
+
+.event-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.event-title {
+  font-weight: 800;
+}
+
+.event-badges {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.points-badge {
+  background: var(--hfs-light-red);
+  color: var(--hfs-red);
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+/* lenyíló rész */
+.event-expand {
+  max-height: 0;
+  overflow: hidden;
+  transition: 0.25s ease;
+}
+
+.event-expand.open {
+  max-height: 200px;
+  margin-top: 10px;
+}
+
+.event-details {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* dobogó badge már van nálad, de biztos ami biztos */
+.res-badge.gold { background: gold; color: black; }
+.res-badge.silver { background: silver; color: black; }
+.res-badge.bronze { background: #cd7f32; color: white; }
+
 /* =========================================
    13. MOBILE
    ========================================= */
