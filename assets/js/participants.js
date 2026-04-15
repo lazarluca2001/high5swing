@@ -1,9 +1,7 @@
 import { fetchCSV } from "./api.js";
 import { safeText } from "./utils.js";
 
-/* =========================
-   CONFIG
-========================= */
+/* ========================= */
 const DIVISION_ORDER = [
     "Champion",
     "All Star",
@@ -17,7 +15,7 @@ let activeRole = "Leader";
 let chartInstance = null;
 
 /* =========================
-   SAFE DOM SETTER 🔥
+   SAFE DOM
 ========================= */
 function setText(id, value) {
     const el = document.getElementById(id);
@@ -25,7 +23,7 @@ function setText(id, value) {
 }
 
 /* =========================
-   DATE PARSER
+   DATE
 ========================= */
 function parseDateSafe(str) {
     const s = safeText(str);
@@ -45,8 +43,6 @@ function extractPeople(rows) {
         r.some(c => safeText(c).toLowerCase() === "name")
     );
 
-    if (headerIndex === -1) return [];
-
     const headers = rows[headerIndex].map(h => safeText(h).toLowerCase());
 
     return rows
@@ -60,132 +56,80 @@ function extractPeople(rows) {
 }
 
 /* =========================
-   LISTA
-========================= */
-export async function loadParticipantsFromSheet() {
-    const root = document.getElementById("participants");
-    if (!root) return;
-
-    root.innerHTML = `<div class="card">Betöltés...</div>`;
-
-    const rows = await fetchCSV("PARTICIPANTS");
-    const people = extractPeople(rows);
-
-    root.innerHTML = people.map(p => `
-        <div class="card">
-            <h2>${p.name}</h2>
-            <p>${p.division || "—"}</p>
-            <a href="./profil.html?id=${encodeURIComponent(p.wsdcId)}">
-                Profil
-            </a>
-        </div>
-    `).join("");
-}
-
-/* =========================
-   PROFIL
+   PROFILE
 ========================= */
 export async function loadProfileFromSheet() {
+
     const container = document.getElementById("profileContainer");
     const loading = document.getElementById("profileLoading");
     const content = document.getElementById("profileContent");
 
-    if (!container || !loading || !content) return;
+    if (!container) return;
 
     const id = new URLSearchParams(window.location.search).get("id");
-    if (!id) return;
 
-    try {
-        /* ========= PERSON ========= */
-        const rows = await fetchCSV("PARTICIPANTS");
-        const people = extractPeople(rows);
-        const person = people.find(p => p.wsdcId === id);
-        if (!person) return;
+    const peopleRows = await fetchCSV("PARTICIPANTS");
+    const people = extractPeople(peopleRows);
+    const person = people.find(p => p.wsdcId === id);
 
-        // 🔥 SAFE SET
-        setText("profileName", person.name);
-        setText("profileDivision", person.division);
-        setText("profileWsdc", person.wsdcId);
-        setText(
-            "profileInitials",
-            person.name.split(" ").map(n => n[0]).join("")
-        );
+    if (!person) return;
 
-        /* ========= RESULTS ========= */
-        const resultRows = await fetchCSV("RESULTS");
+    setText("profileName", person.name);
+    setText("profileDivision", person.division);
+    setText("profileWsdc", person.wsdcId);
+    setText("profileInitials", person.name.split(" ").map(n => n[0]).join(""));
 
-        const headerIndex = resultRows.findIndex(r =>
-            r.some(c => safeText(c).toLowerCase() === "name")
-        );
+    /* ========= RESULTS ========= */
+    const rows = await fetchCSV("RESULTS");
 
-        if (headerIndex === -1) return;
+    const headerIndex = rows.findIndex(r =>
+        r.some(c => safeText(c).toLowerCase() === "name")
+    );
 
-        const headers = resultRows[headerIndex].map(h => safeText(h).toLowerCase());
-        const get = (n) => headers.indexOf(n);
+    const headers = rows[headerIndex].map(h => safeText(h).toLowerCase());
+    const get = (n) => headers.indexOf(n);
 
-        const idx = {
-            name: get("name"),
-            division: get("division"),
-            event: get("event"),
-            date: get("date"),
-            role: get("role"),
-            leader: get("leader"),
-            follower: get("follower"),
-            prelim: get("prelim"),
-            semi: get("semi"),
-            final: get("final"),
-            point: get("point"),
-            partner: get("partner")
-        };
+    const idx = {
+        name: get("name"),
+        division: get("division"),
+        event: get("event"),
+        date: get("date"),
+        role: get("role"),
+        final: get("final"),
+        point: get("point"),
+        partner: get("partner")
+    };
 
-        let results = resultRows
-            .slice(headerIndex + 1)
-            .filter(r => safeText(r[idx.name]) === person.name)
-            .map(r => ({
-                division: safeText(r[idx.division]),
-                role: safeText(r[idx.role]),
-                event: safeText(r[idx.event]),
-                dateRaw: safeText(r[idx.date]),
-                date: parseDateSafe(r[idx.date]),
-                prelim: safeText(r[idx.prelim]),
-                semi: safeText(r[idx.semi]),
-                final: safeText(r[idx.final]),
-                point: (() => {
-                    const raw = safeText(r[idx.point]);
-                    const cleaned = raw.replace(",", ".").match(/-?\d+(\.\d+)?/);
-                    return cleaned ? parseFloat(cleaned[0]) : 0;
-                })(),
-                partner: safeText(r[idx.partner])
-            }))
-            .filter(r => r.event && r.date);
+    let results = rows
+        .slice(headerIndex + 1)
+        .filter(r => safeText(r[idx.name]) === person.name)
+        .map(r => ({
+            division: safeText(r[idx.division]),
+            role: safeText(r[idx.role]),
+            event: safeText(r[idx.event]),
+            dateRaw: safeText(r[idx.date]),
+            date: parseDateSafe(r[idx.date]),
+            final: safeText(r[idx.final]),
+            point: Number(safeText(r[idx.point])) || 0,
+            partner: safeText(r[idx.partner])
+        }))
+        .filter(r => r.date);
 
-        /* ========= FILTER ========= */
-        const filtered = results.filter(r =>
-            (r.role || "").toLowerCase() === activeRole.toLowerCase()
-            && r.point > 0
-        );
+    const filtered = results.filter(r =>
+        r.role.toLowerCase() === activeRole.toLowerCase()
+    );
 
-        renderChart(filtered);
+    renderChart(filtered);
+    renderEvents(filtered, content);
 
-        /* ========= RENDER ========= */
-        content.innerHTML = `<div class="card">Események: ${filtered.length}</div>`;
-
-        loading.style.display = "none";
-        container.style.display = "block";
-
-    } catch (e) {
-        console.error(e);
-    }
+    loading.style.display = "none";
+    container.style.display = "block";
 }
 
 /* =========================
-   CHART (FIXED)
+   CHART
 ========================= */
 function renderChart(results) {
-    if (typeof Chart === "undefined") {
-        console.error("Chart.js nincs betöltve");
-        return;
-    }
 
     const canvas = document.getElementById("pointsChart");
     if (!canvas) return;
@@ -208,36 +152,26 @@ function renderChart(results) {
 
     const datasets = Object.entries(byDivision).map(([division, events]) => {
 
-        const cleanEvents = events
-            .filter(e => e.point > 0 && e.date)
-            .sort((a, b) => a.date - b.date);
-
-        if (cleanEvents.length < 2) return null;
+        events.sort((a, b) => a.date - b.date);
 
         let cumulative = 0;
 
-        const data = cleanEvents.map(e => {
-            cumulative += e.point;
-
-            return {
-                x: e.date.toLocaleDateString("hu-HU"),
-                y: cumulative
-            };
-        });
-
         return {
             label: division,
-            data,
+            data: events.map(e => {
+                cumulative += e.point;
+                return {
+                    x: e.date.toLocaleDateString("hu-HU"),
+                    y: cumulative,
+                    event: e.event,
+                    partner: e.partner
+                };
+            }),
             borderColor: COLORS[division] || "#999",
             tension: 0.4,
             pointRadius: 5
         };
-    }).filter(Boolean);
-
-    if (datasets.length === 0) {
-        console.warn("Nincs elég adat a grafikonhoz");
-        return;
-    }
+    });
 
     if (chartInstance) chartInstance.destroy();
 
@@ -247,9 +181,45 @@ function renderChart(results) {
         options: {
             parsing: false,
             responsive: true,
-            plugins: {
-                legend: { position: "right" }
+
+            interaction: {
+                mode: "nearest",
+                intersect: false
             },
+
+            plugins: {
+                legend: { position: "right" },
+
+                tooltip: {
+                    enabled: false,
+                    external: function(ctx) {
+
+                        const tooltipEl = document.getElementById("chartTooltip");
+                        const tooltip = ctx.tooltip;
+
+                        if (tooltip.opacity === 0) {
+                            tooltipEl.classList.remove("active");
+                            return;
+                        }
+
+                        const p = tooltip.dataPoints[0].raw;
+
+                        tooltipEl.innerHTML = `
+                            <div class="title">${p.event}</div>
+                            <div>Pont: ${p.y}</div>
+                            <div>Partner: ${p.partner || "-"}</div>
+                        `;
+
+                        tooltipEl.style.left =
+                            ctx.chart.canvas.offsetLeft + tooltip.caretX + "px";
+                        tooltipEl.style.top =
+                            ctx.chart.canvas.offsetTop + tooltip.caretY + "px";
+
+                        tooltipEl.classList.add("active");
+                    }
+                }
+            },
+
             scales: {
                 x: { type: "category" },
                 y: { beginAtZero: true }
@@ -258,7 +228,69 @@ function renderChart(results) {
     });
 }
 
+/* =========================
+   EVENTS (ACCORDION)
+========================= */
+function renderEvents(results, container) {
+
+    const grouped = {};
+
+    results.forEach(r => {
+        if (!grouped[r.division]) grouped[r.division] = [];
+        grouped[r.division].push(r);
+    });
+
+    const sortedDivisions = Object.keys(grouped).sort((a, b) =>
+        DIVISION_ORDER.indexOf(a) - DIVISION_ORDER.indexOf(b)
+    );
+
+    let html = `
+        <div class="role-switch">
+            <button onclick="setRole('Leader')" class="${activeRole==="Leader"?"active":""}">Leader</button>
+            <button onclick="setRole('Follower')" class="${activeRole==="Follower"?"active":""}">Follower</button>
+        </div>
+    `;
+
+    let i = 0;
+
+    sortedDivisions.forEach(div => {
+
+        html += `<h2 class="division-title">${div}</h2>`;
+
+        grouped[div]
+            .sort((a,b)=>b.date-a.date)
+            .forEach(r => {
+
+                html += `
+                <div class="event-accordion-item">
+                    <div class="event-header" onclick="toggleAccordion(${i})">
+                        <div>
+                            <div class="event-name">${r.event}</div>
+                            <div class="event-date">${r.dateRaw}</div>
+                        </div>
+                        <div>
+                            <span class="res-badge">${r.final}</span>
+                            <span class="res-badge point">+${r.point}</span>
+                        </div>
+                    </div>
+
+                    <div class="event-body" id="acc-${i}">
+                        Partner: ${r.partner || "-"}
+                    </div>
+                </div>
+                `;
+                i++;
+            });
+    });
+
+    container.innerHTML = html;
+}
+
 /* ========================= */
+window.toggleAccordion = (i) => {
+    document.getElementById(`acc-${i}`)?.classList.toggle("active");
+};
+
 window.setRole = (role) => {
     activeRole = role;
     loadProfileFromSheet();
