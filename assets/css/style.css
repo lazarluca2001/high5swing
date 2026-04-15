@@ -138,3 +138,94 @@ select.month-select {
   .sidebar { position: static; }
   .calendar-grid { grid-template-columns: repeat(7, 120px); overflow-x: auto; }
 }
+
+/* ===== GLOBAL UI ===== */
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+/* ===== WEEKDAY ===== */
+
+.weekday {
+  text-align: center;
+  font-weight: 900;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+/* hétvége */
+.weekday:nth-child(6),
+.weekday:nth-child(7) {
+  color: var(--hfs-red);
+  opacity: 1;
+}
+
+/* hétvége háttér */
+.calendar-grid > :nth-child(7n+6),
+.calendar-grid > :nth-child(7n+7) {
+  background: rgba(128,0,0,0.05);
+}
+
+/* ===== EVENT ===== */
+
+.event-card {
+  background: var(--card-bg);
+  border-left: 4px solid var(--hfs-red);
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
+.event-title {
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+/* ===== SIDEBAR MOBILE ===== */
+
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 280px;
+    height: 100%;
+    background: var(--card-bg);
+    transition: 0.3s;
+    z-index: 999;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+}
+
+/* ===== RAINBOW FIX ===== */
+
+[data-theme="rainbow"] .card,
+[data-theme="rainbow"] .day {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+}
