@@ -2,7 +2,7 @@ import { fetchCSV } from "./api.js";
 import { safeText } from "./utils.js";
 
 /* =========================
-   SEGÉD: CSV → PEOPLE
+   SEGÉD: PEOPLE
 ========================= */
 function extractPeople(rows) {
     const headerIndex = rows.findIndex(r =>
@@ -30,7 +30,7 @@ function extractPeople(rows) {
 }
 
 /* =========================
-   LISTA BETÖLTÉS
+   LISTA
 ========================= */
 export async function loadParticipantsFromSheet() {
     const root = document.getElementById("participants");
@@ -58,13 +58,13 @@ export async function loadParticipantsFromSheet() {
         `).join("");
 
     } catch (e) {
-        console.error("Participants load error:", e);
+        console.error(e);
         root.innerHTML = `<div class="card">Hiba történt</div>`;
     }
 }
 
 /* =========================
-   PROFIL BETÖLTÉS  🔥 EZ HIÁNYZOTT
+   PROFIL + RESULTS
 ========================= */
 export async function loadProfileFromSheet() {
     const container = document.getElementById("profileContainer");
@@ -73,8 +73,7 @@ export async function loadProfileFromSheet() {
 
     if (!container || !loading || !content) return;
 
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+    const id = new URLSearchParams(window.location.search).get("id");
 
     if (!id) {
         loading.innerHTML = "Hiányzó ID.";
@@ -82,6 +81,7 @@ export async function loadProfileFromSheet() {
     }
 
     try {
+        /* ========= PARTICIPANTS ========= */
         const rows = await fetchCSV("PARTICIPANTS");
         const people = extractPeople(rows);
 
@@ -92,35 +92,110 @@ export async function loadProfileFromSheet() {
             return;
         }
 
-        // HERO adatok
-        const nameEl = document.getElementById("profileName");
-        const divisionEl = document.getElementById("profileDivision");
-        const wsdcEl = document.getElementById("profileWsdc");
-        const initialsEl = document.getElementById("profileInitials");
+        // HERO
+        document.getElementById("profileName").innerText = person.name;
+        document.getElementById("profileDivision").innerText = person.division || "—";
+        document.getElementById("profileWsdc").innerText = person.wsdcId;
+        document.getElementById("profileInitials").innerText =
+            person.name.split(" ").map(n => n[0]).join("");
 
-        if (nameEl) nameEl.innerText = person.name;
-        if (divisionEl) divisionEl.innerText = person.division || "—";
-        if (wsdcEl) wsdcEl.innerText = person.wsdcId;
+        /* ========= RESULTS ========= */
+        const resultRows = await fetchCSV("RESULTS");
 
-        if (initialsEl) {
-            initialsEl.innerText = person.name
-                .split(" ")
-                .map(n => n[0])
-                .join("");
+        const headerIndex = resultRows.findIndex(r =>
+            r.some(c => safeText(c).toLowerCase() === "name")
+        );
+
+        if (headerIndex === -1) {
+            content.innerHTML = `<div class="card">Nincs eredmény adat</div>`;
+            return;
         }
 
-        // placeholder content
-        content.innerHTML = `
-            <div class="card">
-                Esemény adatok hamarosan...
-            </div>
-        `;
+        const headers = resultRows[headerIndex].map(h => safeText(h).toLowerCase());
+        const getIdx = (name) => headers.indexOf(name.toLowerCase());
+
+        const nameIdx = getIdx("name");
+        const eventIdx = getIdx("event");
+        const dateIdx = getIdx("date");
+        const prelimIdx = getIdx("prelim");
+        const semiIdx = getIdx("semi");
+        const finalIdx = getIdx("final");
+        const pointIdx = getIdx("point");
+        const partnerIdx = getIdx("partner");
+
+        let results = resultRows
+            .slice(headerIndex + 1)
+            .filter(r => safeText(r[nameIdx]) === person.name)
+            .map(r => ({
+                event: safeText(r[eventIdx]),
+                date: safeText(r[dateIdx]),
+                prelim: safeText(r[prelimIdx]),
+                semi: safeText(r[semiIdx]),
+                final: safeText(r[finalIdx]),
+                points: safeText(r[pointIdx]),
+                partner: safeText(r[partnerIdx])
+            }))
+            .filter(r => r.event);
+
+        // dátum szerint csökkenő
+        results.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        /* ========= UI ========= */
+        if (!results.length) {
+            content.innerHTML = `<div class="card">Nincs még verseny eredmény</div>`;
+        } else {
+            content.innerHTML = results.map((r, i) => `
+                <div class="event-accordion-item">
+                    <div class="event-header" onclick="toggleAccordion(${i})">
+                        <div class="event-main-data">
+                            <div class="event-name">${r.event}</div>
+                            <div class="event-date">${r.date}</div>
+                        </div>
+                        <div>
+                            <span class="res-badge">${r.final || "-"}</span>
+                            <span class="res-badge point">+${r.points || 0}</span>
+                        </div>
+                    </div>
+
+                    <div class="event-body" id="acc-${i}">
+                        <div class="details-grid">
+                            <div class="det">
+                                <label>Prelim</label>
+                                <span>${r.prelim || "-"}</span>
+                            </div>
+                            <div class="det">
+                                <label>Semi</label>
+                                <span>${r.semi || "-"}</span>
+                            </div>
+                            <div class="det">
+                                <label>Final</label>
+                                <span>${r.final || "-"}</span>
+                            </div>
+                            <div class="det full">
+                                <label>Partner</label>
+                                <span>${r.partner || "-"}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+        }
 
         loading.style.display = "none";
         container.style.display = "block";
 
     } catch (e) {
-        console.error("Profile load error:", e);
+        console.error(e);
         loading.innerHTML = "Hiba történt.";
     }
 }
+
+/* =========================
+   ACCORDION
+========================= */
+window.toggleAccordion = (i) => {
+    const el = document.getElementById(`acc-${i}`);
+    if (!el) return;
+
+    el.classList.toggle("active");
+};
