@@ -2,6 +2,20 @@ import { fetchCSV } from "./api.js";
 import { safeText } from "./utils.js";
 
 /* =========================
+   CONFIG
+========================= */
+const DIVISION_ORDER = [
+    "Champion",
+    "All Star",
+    "Advanced",
+    "Intermediate",
+    "Novice",
+    "Newcomer"
+];
+
+let activeRole = "Leader";
+
+/* =========================
    PEOPLE
 ========================= */
 function extractPeople(rows) {
@@ -61,17 +75,12 @@ export async function loadProfileFromSheet() {
     if (!container || !loading || !content) return;
 
     const id = new URLSearchParams(window.location.search).get("id");
-
-    if (!id) {
-        loading.innerHTML = "Hiányzó ID.";
-        return;
-    }
+    if (!id) return;
 
     try {
         /* ========= PERSON ========= */
         const rows = await fetchCSV("PARTICIPANTS");
         const people = extractPeople(rows);
-
         const person = people.find(p => p.wsdcId === id);
         if (!person) return;
 
@@ -124,88 +133,106 @@ export async function loadProfileFromSheet() {
             }))
             .filter(r => r.event);
 
+        /* ========= ROLE FILTER ========= */
+        const filtered = results.filter(r =>
+            (r.role || "").toLowerCase() === activeRole.toLowerCase()
+        );
+
         /* ========= GROUP ========= */
         const grouped = {};
 
-        results.forEach(r => {
-            if (!grouped[r.division]) grouped[r.division] = {};
-            if (!grouped[r.division][r.role]) grouped[r.division][r.role] = [];
-
-            grouped[r.division][r.role].push(r);
+        filtered.forEach(r => {
+            if (!grouped[r.division]) grouped[r.division] = [];
+            grouped[r.division].push(r);
         });
 
+        /* ========= DIVISION SORT ========= */
+        const sortedDivisions = Object.keys(grouped).sort(
+            (a, b) => DIVISION_ORDER.indexOf(a) - DIVISION_ORDER.indexOf(b)
+        );
+
         /* ========= RENDER ========= */
-        let html = "";
+        let html = `
+            <div class="role-switch">
+                <button class="${activeRole === "Leader" ? "active" : ""}" onclick="setRole('Leader')">Leader</button>
+                <button class="${activeRole === "Follower" ? "active" : ""}" onclick="setRole('Follower')">Follower</button>
+            </div>
+        `;
+
         let i = 0;
 
-        Object.entries(grouped).forEach(([division, roles]) => {
-            html += `<h2 style="margin-top:20px;">${division}</h2>`;
+        sortedDivisions.forEach(division => {
+            const events = grouped[division];
 
-            Object.entries(roles).forEach(([role, events]) => {
-                html += `<h3 style="opacity:.7">${role}</h3>`;
+            // 👉 FONTOS: rendezés dátum szerint (FRISS → RÉGI)
+            events.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                events.forEach(r => {
-                    const placement = parseInt(r.final);
-                    let badgeClass = "";
+            html += `<h2 class="division-title">${division}</h2>`;
 
-                    if (placement === 1) badgeClass = "gold";
-                    else if (placement === 2) badgeClass = "silver";
-                    else if (placement === 3) badgeClass = "bronze";
+            events.forEach(r => {
+                const placement = parseInt(r.final);
+                let badgeClass = "";
 
-                    html += `
-                        <div class="event-accordion-item">
-                            <div class="event-header" onclick="toggleAccordion(${i})">
-                                <div>
-                                    <div class="event-name">${r.event}</div>
-                                    <div class="event-date">${r.date}</div>
-                                </div>
+                if (placement === 1) badgeClass = "gold";
+                else if (placement === 2) badgeClass = "silver";
+                else if (placement === 3) badgeClass = "bronze";
 
-                                <div>
-                                    <span class="res-badge ${badgeClass}">
-                                        ${r.final || "-"}
-                                    </span>
-                                    <span class="res-badge point">
-                                        +${r.point || 0}
-                                    </span>
-                                </div>
+                const role = (r.role || "").toLowerCase();
+
+                const fieldSize =
+                    role === "leader"
+                        ? r.leader
+                        : role === "follower"
+                        ? r.follower
+                        : null;
+
+                html += `
+                    <div class="event-accordion-item">
+                        <div class="event-header" onclick="toggleAccordion(${i})">
+                            <div>
+                                <div class="event-name">${r.event}</div>
+                                <div class="event-date">${r.date}</div>
                             </div>
 
-                            <div class="event-body" id="acc-${i}">
-                                <div class="details-grid">
-
-                                    <div class="det">
-                                        <label>Mezőny</label>
-                                        <span>
-                                           ${
-                                               r.role.toLowerCase() === "leader"
-                                                   ? (r.leader || "-")
-                                                   : (r.follower || "-")
-                                           }
-                                       </span>
-                                    </div>
-
-                                    <div class="det">
-                                        <label>Partner</label>
-                                        <span>${r.partner || "-"}</span>
-                                    </div>
-
-                                    <div class="det">
-                                        <label>Prelim</label>
-                                        <span>${r.prelim || "-"}</span>
-                                    </div>
-
-                                    <div class="det">
-                                        <label>Semi</label>
-                                        <span>${r.semi || "-"}</span>
-                                    </div>
-
-                                </div>
+                            <div>
+                                <span class="res-badge ${badgeClass}">
+                                    ${r.final || "-"}
+                                </span>
+                                <span class="res-badge point">
+                                    +${r.point || 0}
+                                </span>
                             </div>
                         </div>
-                    `;
 
-                    i++;
-                });
+                        <div class="event-body" id="acc-${i}">
+                            <div class="details-grid">
+
+                                <div class="det">
+                                    <label>Mezőny</label>
+                                    <span>${fieldSize || "-"}</span>
+                                </div>
+
+                                <div class="det">
+                                    <label>Partner</label>
+                                    <span>${r.partner || "-"}</span>
+                                </div>
+
+                                <div class="det">
+                                    <label>Prelim</label>
+                                    <span>${r.prelim || "-"}</span>
+                                </div>
+
+                                <div class="det">
+                                    <label>Semi</label>
+                                    <span>${r.semi || "-"}</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                i++;
             });
         });
 
@@ -221,10 +248,15 @@ export async function loadProfileFromSheet() {
 }
 
 /* =========================
-   ACCORDION
+   ACTIONS
 ========================= */
 window.toggleAccordion = (i) => {
     const el = document.getElementById(`acc-${i}`);
     if (!el) return;
     el.classList.toggle("active");
+};
+
+window.setRole = (role) => {
+    activeRole = role;
+    loadProfileFromSheet();
 };
