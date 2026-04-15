@@ -17,6 +17,14 @@ let activeRole = "Leader";
 let chartInstance = null;
 
 /* =========================
+   SAFE DOM SETTER 🔥
+========================= */
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = value;
+}
+
+/* =========================
    DATE PARSER
 ========================= */
 function parseDateSafe(str) {
@@ -94,11 +102,14 @@ export async function loadProfileFromSheet() {
         const person = people.find(p => p.wsdcId === id);
         if (!person) return;
 
-        document.getElementById("profileName").innerText = person.name;
-        document.getElementById("profileDivision").innerText = person.division;
-        document.getElementById("profileWsdc").innerText = person.wsdcId;
-        document.getElementById("profileInitials").innerText =
-            person.name.split(" ").map(n => n[0]).join("");
+        // 🔥 SAFE SET
+        setText("profileName", person.name);
+        setText("profileDivision", person.division);
+        setText("profileWsdc", person.wsdcId);
+        setText(
+            "profileInitials",
+            person.name.split(" ").map(n => n[0]).join("")
+        );
 
         /* ========= RESULTS ========= */
         const resultRows = await fetchCSV("RESULTS");
@@ -136,8 +147,6 @@ export async function loadProfileFromSheet() {
                 event: safeText(r[idx.event]),
                 dateRaw: safeText(r[idx.date]),
                 date: parseDateSafe(r[idx.date]),
-                leader: safeText(r[idx.leader]),
-                follower: safeText(r[idx.follower]),
                 prelim: safeText(r[idx.prelim]),
                 semi: safeText(r[idx.semi]),
                 final: safeText(r[idx.final]),
@@ -150,7 +159,7 @@ export async function loadProfileFromSheet() {
             }))
             .filter(r => r.event && r.date);
 
-        /* ========= ROLE FILTER + POINT FILTER 🔥 */
+        /* ========= FILTER ========= */
         const filtered = results.filter(r =>
             (r.role || "").toLowerCase() === activeRole.toLowerCase()
             && r.point > 0
@@ -158,61 +167,8 @@ export async function loadProfileFromSheet() {
 
         renderChart(filtered);
 
-        /* ========= GROUP ========= */
-        const grouped = {};
-        filtered.forEach(r => {
-            if (!grouped[r.division]) grouped[r.division] = [];
-            grouped[r.division].push(r);
-        });
-
-        const sortedDivisions = Object.keys(grouped).sort((a, b) => {
-            const ai = DIVISION_ORDER.indexOf(a);
-            const bi = DIVISION_ORDER.indexOf(b);
-            return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-        });
-
-        let html = `
-            <div class="role-switch">
-                <button class="${activeRole === "Leader" ? "active" : ""}" onclick="setRole('Leader')">Leader</button>
-                <button class="${activeRole === "Follower" ? "active" : ""}" onclick="setRole('Follower')">Follower</button>
-            </div>
-        `;
-
-        let i = 0;
-
-        sortedDivisions.forEach(division => {
-            const events = grouped[division].sort((a, b) => b.date - a.date);
-
-            html += `<h2 class="division-title">${division}</h2>`;
-
-            events.forEach(r => {
-                html += `
-                    <div class="event-accordion-item">
-                        <div class="event-header" onclick="toggleAccordion(${i})">
-                            <div>
-                                <div class="event-name">${r.event}</div>
-                                <div class="event-date">${r.dateRaw}</div>
-                            </div>
-                            <div>
-                                <span class="res-badge">${r.final || "-"}</span>
-                                <span class="res-badge point">+${r.point}</span>
-                            </div>
-                        </div>
-                        <div class="event-body" id="acc-${i}">
-                            <div class="details-grid">
-                                <div class="det">
-                                    <label>Partner</label>
-                                    <span>${r.partner || "-"}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                i++;
-            });
-        });
-
-        content.innerHTML = html;
+        /* ========= RENDER ========= */
+        content.innerHTML = `<div class="card">Események: ${filtered.length}</div>`;
 
         loading.style.display = "none";
         container.style.display = "block";
@@ -226,6 +182,11 @@ export async function loadProfileFromSheet() {
    CHART (FIXED)
 ========================= */
 function renderChart(results) {
+    if (typeof Chart === "undefined") {
+        console.error("Chart.js nincs betöltve");
+        return;
+    }
+
     const canvas = document.getElementById("pointsChart");
     if (!canvas) return;
 
@@ -259,10 +220,8 @@ function renderChart(results) {
             cumulative += e.point;
 
             return {
-                x: e.date.toLocaleDateString("hu-HU"), // 🔥 STRING!
-                y: cumulative,
-                event: e.event,
-                partner: e.partner
+                x: e.date.toLocaleDateString("hu-HU"),
+                y: cumulative
             };
         });
 
@@ -275,6 +234,11 @@ function renderChart(results) {
         };
     }).filter(Boolean);
 
+    if (datasets.length === 0) {
+        console.warn("Nincs elég adat a grafikonhoz");
+        return;
+    }
+
     if (chartInstance) chartInstance.destroy();
 
     chartInstance = new Chart(canvas, {
@@ -283,30 +247,18 @@ function renderChart(results) {
         options: {
             parsing: false,
             responsive: true,
-
             plugins: {
-                legend: {
-                    position: "right"
-                }
+                legend: { position: "right" }
             },
-
             scales: {
-                x: {
-                    type: "category" // 🔥 EZ A FIX
-                },
-                y: {
-                    beginAtZero: true
-                }
+                x: { type: "category" },
+                y: { beginAtZero: true }
             }
         }
     });
 }
 
 /* ========================= */
-window.toggleAccordion = (i) => {
-    document.getElementById(`acc-${i}`)?.classList.toggle("active");
-};
-
 window.setRole = (role) => {
     activeRole = role;
     loadProfileFromSheet();
