@@ -5,181 +5,267 @@
   --hfs-red: #800000;
   --hfs-red-hover: #a00000;
   --hfs-light-red: #fff0f0;
+
   --bg-color: #f4f4f4;
   --card-bg: #ffffff;
   --text-color: #333333;
   --text-muted: #666666;
   --border-color: #dddddd;
   --nav-bg: rgba(255, 255, 255, 0.92);
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --radius-xl: 18px;
-  --radius-lg: 14px;
+
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+
+  --radius-xl: 20px;
+  --radius-lg: 16px;
   --radius-md: 12px;
+
   --sidebar-w: 300px;
   --today-bg: #fff0f0;
 }
 
+/* DARK */
 [data-theme="dark"] {
-  --bg-color: #0a0a0a; --card-bg: #1a1a1a; --text-color: #f0f0f0;
-  --text-muted: #aaaaaa; --border-color: #333333; --nav-bg: rgba(30, 30, 30, 0.9);
-  --hfs-red: #ff4d4d; --hfs-light-red: #2d1a1a; --today-bg: #3d1010;
+  --bg-color: #0a0a0a;
+  --card-bg: #1a1a1a;
+  --text-color: #f0f0f0;
+  --text-muted: #aaaaaa;
+  --border-color: #333333;
+  --nav-bg: rgba(30, 30, 30, 0.9);
+
+  --hfs-red: #ff4d4d;
+  --hfs-light-red: #2d1a1a;
+  --today-bg: #3d1010;
 }
 
+/* RAINBOW */
 [data-theme="rainbow"] {
-  --bg-color: radial-gradient(circle at 20% 20%, rgba(154, 77, 255, 0.16), transparent 35%), #0a0618;
-  --card-bg: rgba(255, 255, 255, 0.08); --text-color: #ffffff;
-  --border-color: rgba(255, 255, 255, 0.18); --hfs-red: #ff9a1f;
-  --nav-bg: rgba(10, 6, 24, 0.85); --today-bg: rgba(255, 154, 31, 0.2);
+  --bg-color: radial-gradient(circle at 20% 20%, rgba(154,77,255,0.2), transparent 40%), #0a0618;
+  --card-bg: rgba(255,255,255,0.08);
+  --text-color: #ffffff;
+  --border-color: rgba(255,255,255,0.2);
+
+  --hfs-red: #ff9a1f;
+  --nav-bg: rgba(10,6,24,0.85);
+  --today-bg: rgba(255,154,31,0.2);
 }
 
 /* =========================================
-   2. ALAPOK ÉS LAYOUT
+   2. BASE
    ========================================= */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, -apple-system, sans-serif; color: var(--text-color); background: var(--bg-color); line-height: 1.5; transition: 0.3s; min-height: 100vh; }
-.shell { max-width: 1400px; margin: 0 auto; padding: 28px; }
-
-.topbar {
-  position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 24px; background: var(--nav-bg); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
-}
-.brand { font-weight: 900; display: flex; align-items: center; gap: 8px; font-size: 1.2rem; }
-.brand::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--hfs-red); }
-
-.nav { display: flex; gap: 8px; }
-.nav a { padding: 8px 16px; border-radius: 999px; font-weight: 600; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
-.nav a.active { background: var(--hfs-red); color: white; }
-
-.layout, .calendar-layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; gap: 32px; align-items: start; }
-
-/* =========================================
-   3. SIDEBAR ÉS KÁRTYÁK
-   ========================================= */
-.sidebar { position: sticky; top: 100px; }
-.side-card { 
-    background: var(--card-bg); border: 1px solid var(--border-color); 
-    border-radius: var(--radius-xl); padding: 20px; margin-bottom: 20px; 
-    box-shadow: var(--shadow); 
-}
-.side-card h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; opacity: 0.7; }
-
-.card { 
-    background: var(--card-bg); border: 1px solid var(--border-color); 
-    border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow); 
-    transition: 0.3s; text-decoration: none; color: inherit; 
-}
-.card:hover { transform: translateY(-4px); border-color: var(--hfs-red); }
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-
-/* =========================================
-   4. NAPTÁR (JAVÍTOTT)
-   ========================================= */
-.calendar-page .calendar-grid { 
-    display: grid; grid-template-columns: repeat(7, 1fr); 
-    gap: 10px; margin-top: 20px; 
-}
-.calendar-page .weekday { 
-    text-align: center; font-weight: 800; font-size: 0.7rem; 
-    color: var(--text-muted); padding-bottom: 10px; 
-}
-.calendar-page .day { 
-    background: var(--card-bg); border: 1px solid var(--border-color); 
-    border-radius: var(--radius-md); min-height: 120px; padding: 10px; 
-}
-.calendar-page .day.today { border: 2px solid var(--hfs-red); background: var(--today-bg); }
-.calendar-page .day-number { font-weight: 800; opacity: 0.5; font-size: 0.9rem; }
-
-.event-card { 
-    background: var(--hfs-light-red); border-left: 4px solid var(--hfs-red); 
-    padding: 6px; border-radius: 4px; margin-top: 6px; font-size: 0.75rem; 
-}
-.person-tag { 
-    display: inline-block; font-size: 0.65rem; padding: 2px 4px; 
-    background: var(--card-bg); border: 1px solid var(--border-color); 
-    border-radius: 4px; margin: 1px; 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* =========================================
-   5. VEZÉRLŐK (GOMBOK, SELECT)
-   ========================================= */
-.month-display-container { 
-    display: flex; flex-direction: column; align-items: center; gap: 15px; 
-    background: var(--card-bg); padding: 20px; border-radius: var(--radius-xl); 
-}
-.month-title-group { display: flex; align-items: center; gap: 20px; }
-.month-display { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; }
-
-.nav-btn, .today-btn, .filter-btn {
-    background: var(--hfs-red); color: white; border: none; 
-    padding: 8px 16px; border-radius: 50px; cursor: pointer; font-weight: 700;
-}
-.nav-btn { width: 40px; height: 40px; padding: 0; }
-
-select.month-select {
-    width: 100%; padding: 10px; border-radius: 10px; 
-    background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color);
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: 0.3s;
 }
 
-/* =========================================
-   6. PROFIL ÉS ACCORDION
-   ========================================= */
-.res-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; }
-.res-badge.final { background: var(--hfs-red); color: white; }
-.res-badge.point { background: #2e7d32; color: white; }
-
-.event-body { 
-    max-height: 0; overflow: hidden; transition: 0.3s; 
-    background: rgba(0,0,0,0.03); border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-}
-.event-body.active { max-height: 400px; padding: 20px; border-top: 1px solid var(--border-color); }
-
-@media (max-width: 1024px) {
-  .layout, .calendar-layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; }
-  .calendar-grid { grid-template-columns: repeat(7, 120px); overflow-x: auto; }
-}
-
-/* ===== GLOBAL UI ===== */
-
-.container {
-  max-width: 1200px;
+.shell {
+  max-width: 1400px;
   margin: auto;
-  padding: 20px;
+  padding: 30px;
 }
 
+/* =========================================
+   3. TOPBAR
+   ========================================= */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 24px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.brand {
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--hfs-red);
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+}
+
+.nav a {
+  padding: 8px 16px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.nav a.active {
+  background: var(--hfs-red);
+  color: white;
+}
+
+/* =========================================
+   4. LAYOUT
+   ========================================= */
+.layout,
+.calendar-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  gap: 32px;
+}
+
+/* =========================================
+   5. SIDEBAR
+   ========================================= */
+.sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.side-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+
+.side-card h3 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  opacity: 0.7;
+}
+
+/* =========================================
+   6. CARDS
+   ========================================= */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
 }
 
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  padding: 20px;
   border-radius: var(--radius-xl);
+  padding: 20px;
   box-shadow: var(--shadow);
-  transition: 0.2s;
+  transition: 0.25s;
 }
 
 .card:hover {
   transform: translateY(-4px);
+  border-color: var(--hfs-red);
 }
 
-/* ===== WEEKDAY ===== */
+/* =========================================
+   7. NAPTÁR HEADER (WOW rész)
+   ========================================= */
+.calendar-page .month-display-container {
+  background: linear-gradient(135deg, var(--hfs-red), var(--hfs-red-hover));
+  color: white;
+  border-radius: 24px;
+  padding: 40px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.calendar-page .month-display {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: 5px;
+}
+
+.nav-btn,
+.today-btn {
+  background: white;
+  color: var(--hfs-red);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.nav-btn {
+  width: 44px;
+  height: 44px;
+}
+
+/* =========================================
+   8. CALENDAR GRID
+   ========================================= */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 16px;
+}
 
 .weekday {
   text-align: center;
-  font-weight: 900;
   font-size: 0.75rem;
-  opacity: 0.7;
+  font-weight: 900;
+  opacity: 0.6;
 }
 
-/* hétvége */
 .weekday:nth-child(6),
 .weekday:nth-child(7) {
   color: var(--hfs-red);
   opacity: 1;
+}
+
+/* =========================================
+   9. DAY CARD
+   ========================================= */
+.day {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  min-height: 140px;
+  padding: 10px;
+  position: relative;
+  transition: 0.2s;
+}
+
+.day:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.day.today {
+  border: 2px solid var(--hfs-red);
+  background: linear-gradient(135deg, var(--today-bg), transparent);
+}
+
+.day-number {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  opacity: 0.6;
 }
 
 /* hétvége háttér */
@@ -188,24 +274,63 @@ select.month-select {
   background: rgba(128,0,0,0.05);
 }
 
-/* ===== EVENT ===== */
-
+/* =========================================
+   10. EVENT CARD
+   ========================================= */
 .event-card {
-  background: var(--card-bg);
-  border-left: 4px solid var(--hfs-red);
+  background: linear-gradient(135deg, #fff0f0, #ffe5e5);
+  border-radius: 10px;
   padding: 8px;
-  border-radius: 8px;
   margin-top: 6px;
+  font-size: 0.75rem;
 }
 
 .event-title {
-  font-weight: 800;
-  font-size: 0.8rem;
+  font-weight: 900;
+  margin-bottom: 4px;
 }
 
-/* ===== SIDEBAR MOBILE ===== */
+/* TAG */
+.person-tag {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: white;
+  margin: 2px;
+}
 
+.status-biztos {
+  background: #e8f5e9;
+}
+
+.status-talan {
+  background: #fff3e0;
+}
+
+/* =========================================
+   11. FORM ELEMEK
+   ========================================= */
+select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-color);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* =========================================
+   12. MOBILE
+   ========================================= */
 @media (max-width: 1024px) {
+  .layout,
+  .calendar-layout {
+    grid-template-columns: 1fr;
+  }
+
   .sidebar {
     position: fixed;
     left: -100%;
@@ -215,17 +340,29 @@ select.month-select {
     background: var(--card-bg);
     transition: 0.3s;
     z-index: 999;
+    padding: 20px;
   }
 
   .sidebar.open {
     left: 0;
   }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, 120px);
+    overflow-x: auto;
+  }
 }
 
-/* ===== RAINBOW FIX ===== */
-
+/* =========================================
+   13. RAINBOW EXTRA
+   ========================================= */
 [data-theme="rainbow"] .card,
-[data-theme="rainbow"] .day {
-  background: rgba(255,255,255,0.06);
+[data-theme="rainbow"] .day,
+[data-theme="rainbow"] .event-card {
+  background: rgba(255,255,255,0.1);
   backdrop-filter: blur(10px);
+}
+
+[data-theme="rainbow"] .month-display-container {
+  background: linear-gradient(135deg, #ff9a1f, #ff4d4d, #9a4dff);
 }
