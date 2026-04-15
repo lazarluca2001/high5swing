@@ -323,7 +323,15 @@ button {
 }
 
 /* =========================================
-   12. MOBILE
+   12. Profil
+   ========================================= */
+
+.res-badge.gold { background: gold; color: black; }
+.res-badge.silver { background: silver; color: black; }
+.res-badge.bronze { background: #cd7f32; color: white; }
+
+/* =========================================
+   13. MOBILE
    ========================================= */
 @media (max-width: 1024px) {
   .layout,
