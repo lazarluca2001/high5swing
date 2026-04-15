@@ -14,17 +14,13 @@ const DIVISION_ORDER = [
 let activeRole = "Leader";
 let chartInstance = null;
 
-/* =========================
-   SAFE DOM
-========================= */
+/* ========================= */
 function setText(id, value) {
     const el = document.getElementById(id);
     if (el) el.innerText = value;
 }
 
-/* =========================
-   DATE
-========================= */
+/* ========================= */
 function parseDateSafe(str) {
     const s = safeText(str);
     if (!s) return null;
@@ -35,9 +31,7 @@ function parseDateSafe(str) {
     return new Date(parts[0], parts[1] - 1, parts[2]);
 }
 
-/* =========================
-   PEOPLE
-========================= */
+/* ========================= */
 function extractPeople(rows) {
     const headerIndex = rows.findIndex(r =>
         r.some(c => safeText(c).toLowerCase() === "name")
@@ -57,9 +51,7 @@ function extractPeople(rows) {
         .filter(p => p.name && p.wsdcId);
 }
 
-/* =========================
-   PARTICIPANTS LISTA ✅
-========================= */
+/* ========================= */
 export async function loadParticipantsFromSheet() {
     const root = document.getElementById("participants");
     if (!root) return;
@@ -86,9 +78,7 @@ export async function loadParticipantsFromSheet() {
     }
 }
 
-/* =========================
-   PROFILE
-========================= */
+/* ========================= */
 export async function loadProfileFromSheet() {
 
     const container = document.getElementById("profileContainer");
@@ -101,7 +91,6 @@ export async function loadProfileFromSheet() {
     if (!id) return;
 
     try {
-        /* ========= PERSON ========= */
         const rows = await fetchCSV("PARTICIPANTS");
         const people = extractPeople(rows);
         const person = people.find(p => p.wsdcId === id);
@@ -117,7 +106,6 @@ export async function loadProfileFromSheet() {
             link.href = `https://www.worldsdc.com/registry-points/?num=${person.wsdcId}`;
         }
 
-        /* ========= RESULTS ========= */
         const resultRows = await fetchCSV("RESULTS");
 
         const headerIndex = resultRows.findIndex(r =>
@@ -135,9 +123,6 @@ export async function loadProfileFromSheet() {
             event: get("event"),
             date: get("date"),
             role: get("role"),
-            prelim: get("prelim"),
-            semi: get("semi"),
-            final: get("final"),
             point: get("point"),
             partner: get("partner")
         };
@@ -149,11 +134,7 @@ export async function loadProfileFromSheet() {
                 division: safeText(r[idx.division]),
                 role: safeText(r[idx.role]),
                 event: safeText(r[idx.event]),
-                dateRaw: safeText(r[idx.date]),
                 date: parseDateSafe(r[idx.date]),
-                prelim: safeText(r[idx.prelim]),
-                semi: safeText(r[idx.semi]),
-                final: safeText(r[idx.final]),
                 point: Number(safeText(r[idx.point])) || 0,
                 partner: safeText(r[idx.partner])
             }))
@@ -174,9 +155,8 @@ export async function loadProfileFromSheet() {
     }
 }
 
-/* =========================
-   CHART
-========================= */
+/* ========================= */
+/* 🔥 JAVÍTOTT CHART */
 function renderChart(results) {
 
     const canvas = document.getElementById("pointsChart");
@@ -191,8 +171,17 @@ function renderChart(results) {
         "Champion": "#B71C1C"
     };
 
-    const byDivision = {};
+    const allDates = [...new Set(
+        results
+            .filter(r => r.point > 0 && r.date)
+            .map(r => r.date.getTime())
+    )].sort((a, b) => a - b);
 
+    const labels = allDates.map(ts =>
+        new Date(ts).toLocaleDateString("hu-HU")
+    );
+
+    const byDivision = {};
     results.forEach(r => {
         if (!byDivision[r.division]) byDivision[r.division] = [];
         byDivision[r.division].push(r);
@@ -200,25 +189,32 @@ function renderChart(results) {
 
     const datasets = Object.entries(byDivision).map(([division, events]) => {
 
-        const clean = events
+        const sorted = events
             .filter(e => e.point > 0 && e.date)
             .sort((a, b) => a.date - b.date);
 
-        if (clean.length < 2) return null;
+        if (sorted.length === 0) return null;
 
         let cumulative = 0;
+        const dataMap = {};
+
+        sorted.forEach(e => {
+            cumulative += e.point;
+            dataMap[e.date.getTime()] = cumulative;
+        });
+
+        let lastValue = 0;
+
+        const data = allDates.map(ts => {
+            if (dataMap[ts] !== undefined) {
+                lastValue = dataMap[ts];
+            }
+            return lastValue;
+        });
 
         return {
             label: division,
-            data: clean.map((e, i) => {
-                cumulative += e.point;
-                return {
-                    x: `${e.date.toLocaleDateString("hu-HU")} #${i}`,
-                    y: cumulative,
-                    event: e.event,
-                    partner: e.partner
-                };
-            }),
+            data,
             borderColor: COLORS[division] || "#999",
             tension: 0.4
         };
@@ -228,26 +224,22 @@ function renderChart(results) {
 
     chartInstance = new Chart(canvas, {
         type: "line",
-        data: { datasets },
+        data: {
+            labels,
+            datasets
+        },
         options: {
-            parsing: false,
-            plugins: { legend: { position: "right" } },
+            plugins: {
+                legend: { position: "right" }
+            },
             scales: {
-                x: {
-                    type: "category",
-                    ticks: {
-                        callback: v => v.split(" #")[0]
-                    }
-                },
                 y: { beginAtZero: true }
             }
         }
     });
 }
 
-/* =========================
-   EVENTS
-========================= */
+/* ========================= */
 function renderEvents(results, container) {
 
     const grouped = {};
@@ -259,8 +251,8 @@ function renderEvents(results, container) {
 
     let html = `
         <div class="role-switch">
-            <button onclick="setRole('Leader')">Leader</button>
-            <button onclick="setRole('Follower')">Follower</button>
+            <button class="${activeRole === 'Leader' ? 'active' : ''}" onclick="setRole('Leader')">Leader</button>
+            <button class="${activeRole === 'Follower' ? 'active' : ''}" onclick="setRole('Follower')">Follower</button>
         </div>
     `;
 
@@ -268,11 +260,13 @@ function renderEvents(results, container) {
         html += `<h2>${div}</h2>`;
 
         grouped[div].forEach((r, i) => {
+            const id = `${div}-${i}`;
+
             html += `
-                <div onclick="toggleAccordion(${i})">
+                <div onclick="toggleAccordion('${id}')">
                     ${r.event} (+${r.point})
                 </div>
-                <div id="acc-${i}" style="display:none">
+                <div id="acc-${id}" style="display:none">
                     Partner: ${r.partner}
                 </div>
             `;
@@ -283,8 +277,8 @@ function renderEvents(results, container) {
 }
 
 /* ========================= */
-window.toggleAccordion = (i) => {
-    const el = document.getElementById(`acc-${i}`);
+window.toggleAccordion = (id) => {
+    const el = document.getElementById(`acc-${id}`);
     if (el) el.style.display = el.style.display === "none" ? "block" : "none";
 };
 
