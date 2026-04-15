@@ -249,6 +249,74 @@ a {
   gap: 10px;
 }
 
+/* Résztvevői kártya extra stílusok */
+.member-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px;
+}
+
+.member-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.member-division {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.wsdc-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.wsdc-arrow-link {
+    color: var(--hfs-red);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+}
+
+.wsdc-arrow-link:hover {
+    transform: translateX(4px);
+}
+
+.card-footer {
+    margin-top: 20px;
+}
+
+.profile-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background: var(--hfs-light-red);
+    color: var(--hfs-red);
+    border: 1px solid color-mix(in srgb, var(--hfs-red) 20%, transparent);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.profile-btn:hover {
+    background: var(--hfs-red);
+    color: white;
+}
+
+/* Szivárvány téma esetén a gomb is kapjon gradienst hoverre */
+[data-theme="rainbow"] .profile-btn:hover {
+    background: linear-gradient(90deg, var(--rainbow-orange), var(--rainbow-red));
+    border-color: transparent;
+}
+
 .calendar-layout {
   display: grid;
   grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
