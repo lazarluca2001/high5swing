@@ -303,12 +303,14 @@ function renderEvents(results, container) {
 
 let openEventId = null;
 
-window.toggleEvent = (id) => {
+document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-event-id]");
+    if (!btn) return;
 
-    // előző bezárása
+    const id = btn.dataset.eventId;
+
     if (openEventId && openEventId !== id) {
-        const prev = document.getElementById(`exp-${openEventId}`);
-        if (prev) prev.classList.remove("open");
+        document.getElementById(`exp-${openEventId}`)?.classList.remove("open");
     }
 
     const el = document.getElementById(`exp-${id}`);
@@ -318,4 +320,4 @@ window.toggleEvent = (id) => {
 
     el.classList.toggle("open", !isOpen);
     openEventId = isOpen ? null : id;
-};
+});
