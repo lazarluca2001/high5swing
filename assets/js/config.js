@@ -11,7 +11,7 @@ export const CAL_CONFIG = {
         "Mózes": "🦄",
         "Luca": "🐶",
         "Zoli": "🕺",
-        "Viki": "🦦"
+        "Regi": "🦦"
     },
 
     validStatuses: ["igen", "talán", "talan", "fizetve", "igazolt"],
