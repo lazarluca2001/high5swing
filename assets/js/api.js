@@ -6,10 +6,13 @@ const cache = {};
 export async function fetchCSV(type) {
     if (cache[type]) return cache[type];
 
-    const res = await fetch(CSV_URLS[type]);
+    const url = CSV_URLS[type];
+    if (!url) throw new Error(`Nincs URL: ${type}`);
+
+    const res = await fetch(url);
 
     if (!res.ok) {
-        throw new Error(`Fetch hiba: ${type}`);
+        throw new Error(`Fetch hiba: ${type} (${res.status})`);
     }
 
     const text = await res.text();
