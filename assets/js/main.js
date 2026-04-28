@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Naptár oldal
         if (document.getElementById("calendar")) {
-            await initCalendarPage();
-        }
+    initCalendarPage(); // nincs szükség await-re
+}
 
     } catch (e) {
         console.error("MAIN ERROR:", e);
