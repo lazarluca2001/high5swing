@@ -1,61 +1,46 @@
 /* =========================================
-   1. VÁLTOZÓK ÉS TÉMÁK
-   ========================================= */
+   1. VARIABLES
+========================================= */
 :root {
   --hfs-red: #800000;
   --hfs-red-hover: #a00000;
   --hfs-light-red: #fff0f0;
 
   --bg-color: #f4f4f4;
-  --card-bg: #ffffff;
-  --text-color: #333333;
-  --text-muted: #666666;
-  --border-color: #dddddd;
-  --nav-bg: rgba(255, 255, 255, 0.92);
+  --card-bg: rgba(255,255,255,0.85);
+  --text-color: #333;
+  --text-muted: #666;
+  --border-color: rgba(0,0,0,0.08);
+  --nav-bg: rgba(255,255,255,0.7);
 
-  --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 6px 20px rgba(0,0,0,0.06);
+  --shadow-strong: 0 15px 40px rgba(0,0,0,0.12);
 
-  --radius-xl: 20px;
-  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-lg: 18px;
   --radius-md: 12px;
 
-  --sidebar-w: 300px;
   --today-bg: #fff0f0;
 }
 
 /* DARK */
 [data-theme="dark"] {
   --bg-color: #0a0a0a;
-  --card-bg: #1a1a1a;
+  --card-bg: rgba(25,25,25,0.7);
   --text-color: #f0f0f0;
-  --text-muted: #aaaaaa;
-  --border-color: #333333;
-  --nav-bg: rgba(30, 30, 30, 0.9);
+  --text-muted: #aaa;
+  --border-color: rgba(255,255,255,0.08);
 
   --hfs-red: #ff4d4d;
   --hfs-light-red: #2d1a1a;
   --today-bg: #3d1010;
 }
 
-/* RAINBOW */
-[data-theme="rainbow"] {
-  --bg-color: radial-gradient(circle at 20% 20%, rgba(154,77,255,0.2), transparent 40%), #0a0618;
-  --card-bg: rgba(255,255,255,0.08);
-  --text-color: #ffffff;
-  --border-color: rgba(255,255,255,0.2);
-
-  --hfs-red: #ff9a1f;
-  --nav-bg: rgba(10,6,24,0.85);
-  --today-bg: rgba(255,154,31,0.2);
-}
-
 /* =========================================
    2. BASE
-   ========================================= */
+========================================= */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 body {
@@ -65,15 +50,9 @@ body {
   transition: 0.3s;
 }
 
-.shell {
-  max-width: 1400px;
-  margin: auto;
-  padding: 30px;
-}
-
 /* =========================================
    3. TOPBAR
-   ========================================= */
+========================================= */
 .topbar {
   position: sticky;
   top: 0;
@@ -85,7 +64,7 @@ body {
 
   padding: 14px 24px;
   background: var(--nav-bg);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -104,154 +83,110 @@ body {
   background: var(--hfs-red);
 }
 
-.nav {
-  display: flex;
-  gap: 8px;
-}
-
-.nav a {
-  padding: 8px 16px;
-  border-radius: 999px;
-  text-decoration: none;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.nav a.active {
-  background: var(--hfs-red);
-  color: white;
-}
-
 /* =========================================
    4. LAYOUT
-   ========================================= */
-.layout,
+========================================= */
 .calendar-layout {
   display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-columns: 300px 1fr;
   gap: 32px;
 }
 
 /* =========================================
    5. SIDEBAR
-   ========================================= */
-.sidebar {
-  position: sticky;
-  top: 100px;
-}
-
+========================================= */
 .side-card {
   background: var(--card-bg);
+  backdrop-filter: blur(14px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: var(--shadow);
-}
-
-.side-card h3 {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-  opacity: 0.7;
+  box-shadow: var(--shadow-soft);
 }
 
 /* =========================================
-   6. CARDS
-   ========================================= */
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-}
+   6. HEADER (WOW)
+========================================= */
+.month-display-container {
+  position: relative;
+  overflow: hidden;
 
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-xl);
-  padding: 20px;
-  box-shadow: var(--shadow);
-  transition: 0.25s;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  border-color: var(--hfs-red);
-}
-
-/* =========================================
-   7. NAPTÁR HEADER (WOW rész)
-   ========================================= */
-.calendar-page .month-display-container {
   background: linear-gradient(135deg, var(--hfs-red), var(--hfs-red-hover));
-  color: white;
-  border-radius: 24px;
+  border-radius: 28px;
   padding: 40px;
   margin-bottom: 30px;
-  text-align: center;
+  color: white;
 }
 
-.calendar-page .month-display {
-  font-size: 2.4rem;
+/* animated gradient overlay */
+.month-display-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, #800000, #ff4d4d, #800000);
+  background-size: 200% 200%;
+  animation: gradientMove 6s ease infinite;
+  opacity: 0.3;
+}
+
+@keyframes gradientMove {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
+}
+
+.month-display {
+  font-size: 2.6rem;
   font-weight: 900;
-  letter-spacing: 5px;
-}
-
-.nav-btn,
-.today-btn {
-  background: white;
-  color: var(--hfs-red);
-  border: none;
-  padding: 8px 14px;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: 800;
-}
-
-.nav-btn {
-  width: 44px;
-  height: 44px;
+  letter-spacing: 6px;
 }
 
 /* =========================================
-   8. CALENDAR GRID
-   ========================================= */
+   7. CALENDAR GRID
+========================================= */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 16px;
-}
-
-.weekday {
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: 900;
-  opacity: 0.6;
-}
-
-.weekday:nth-child(6),
-.weekday:nth-child(7) {
-  color: var(--hfs-red);
-  opacity: 1;
+  gap: 18px;
 }
 
 /* =========================================
-   9. DAY CARD
-   ========================================= */
+   8. DAY CARD (WOW)
+========================================= */
 .day {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  min-height: 140px;
-  padding: 10px;
   position: relative;
-  transition: 0.2s;
+  min-height: 150px;
+  padding: 10px;
+
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow-soft);
 }
 
 .day:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow);
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: var(--shadow-strong);
+}
+
+/* light overlay */
+.day::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent);
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.day:hover::before {
+  opacity: 1;
 }
 
 .day.today {
@@ -268,35 +203,58 @@ body {
   opacity: 0.6;
 }
 
-/* hétvége háttér */
-.calendar-grid > :nth-child(7n+6),
-.calendar-grid > :nth-child(7n+7) {
-  background: rgba(128,0,0,0.05);
+/* =========================================
+   9. EVENT CARD (FIXED + WOW)
+========================================= */
+.event-card {
+  margin-top: 6px;
+  padding: 8px;
+
+  border-radius: 10px;
+  font-size: 0.75rem;
+
+  background: linear-gradient(135deg, #fff0f0, #ffe5e5);
+  border: 1px solid rgba(128,0,0,0.08);
+
+  transition: all 0.25s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
-/* =========================================
-   10. EVENT CARD
-   ========================================= */
-.event-card {
-  background: linear-gradient(135deg, #fff0f0, #ffe5e5);
-  border-radius: 10px;
-  padding: 8px;
-  margin-top: 6px;
-  font-size: 0.75rem;
+.event-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(128,0,0,0.25);
+}
+
+/* glow */
+.event-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(255,255,255,0.6), transparent 60%);
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.event-card:hover::after {
+  opacity: 1;
 }
 
 .event-title {
-  font-weight: 900;
+  font-weight: 800;
   margin-bottom: 4px;
 }
 
-/* TAG */
+/* =========================================
+   10. TAGS
+========================================= */
 .person-tag {
   font-size: 0.65rem;
   padding: 2px 6px;
   border-radius: 6px;
-  background: white;
   margin: 2px;
+  display: inline-block;
 }
 
 .status-biztos {
@@ -308,247 +266,47 @@ body {
 }
 
 /* =========================================
-   11. FORM ELEMEK
-   ========================================= */
-select {
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
-  color: var(--text-color);
-}
-
-button {
-  font-family: inherit;
-}
-
-/* =========================================
-   12. Profil
-   ========================================= */
-
-.res-badge.gold { background: gold; color: black; }
-.res-badge.silver { background: silver; color: black; }
-.res-badge.bronze { background: #cd7f32; color: white; }
-
-.role-switch {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.role-switch button {
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    cursor: pointer;
-}
-
-.role-switch button.active {
-    background: var(--hfs-red);
-    color: white;
-}
-
-.division-title {
-    margin-top: 24px;
-    font-weight: 900;
-}
-
-.res-badge.gold { background: gold; color: black; }
-.res-badge.silver { background: silver; color: black; }
-.res-badge.bronze { background: #cd7f32; color: white; }
-
-.chart-tooltip {
-  position: absolute;
-  background: #1e1e1e;
-  color: white;
-  padding: 12px;
-  border-radius: 10px;
-  pointer-events: none;
-  transform: translate(-50%, -120%);
-  opacity: 0;
-  transition: 0.15s ease;
-  font-size: 13px;
-  min-width: 180px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  z-index: 999;
-}
-
-.chart-tooltip.active {
-  opacity: 1;
-}
-
-.chart-tooltip .title {
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-
-.chart-tooltip .row {
-  display: flex;
-  justify-content: space-between;
-}
-
-/* =========================
-   PROFILE EVENTS UI
-========================= */
-
-.division-block {
-  margin-top: 24px;
-}
-
-.division-header {
-  font-size: 1.2rem;
-  font-weight: 900;
-  margin-bottom: 10px;
-  padding-left: 6px;
-  border-left: 4px solid var(--hfs-red);
-}
-
-.event-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.event-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 12px 14px;
-  border-radius: var(--radius-md);
-
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-
-  transition: 0.2s;
-}
-
-.event-item:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-  border-color: var(--hfs-red);
-}
-
-.event-main {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.event-title {
-  font-weight: 700;
-}
-
-.event-partner {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.event-points {
-  font-weight: 900;
+   11. FILTER BUTTON
+========================================= */
+.filter-btn {
   padding: 6px 10px;
   border-radius: 999px;
-  background: #eee;
-  font-size: 0.8rem;
-}
-
-.event-points.positive {
-  background: var(--hfs-light-red);
-  color: var(--hfs-red);
-}
-
-/* =========================
-   EVENT ACCORDION
-========================= */
-
-.event-card {
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 14px;
   background: var(--card-bg);
   cursor: pointer;
   transition: 0.2s;
 }
 
-.event-card:hover {
-  border-color: var(--hfs-red);
-  box-shadow: var(--shadow);
+.filter-btn.active {
+  background: var(--hfs-red);
+  color: white;
+  box-shadow: 0 0 12px rgba(128,0,0,0.4);
 }
 
-.event-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* =========================================
+   12. ANIMATION
+========================================= */
+.day {
+  animation: fadeInUp 0.4s ease;
 }
 
-.event-title {
-  font-weight: 800;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
-.event-badges {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.points-badge {
-  background: var(--hfs-light-red);
-  color: var(--hfs-red);
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-
-/* lenyíló rész */
-.event-expand {
-  max-height: 0;
-  overflow: hidden;
-  transition: 0.25s ease;
-}
-
-.event-expand.open {
-  max-height: 200px;
-  margin-top: 10px;
-}
-
-.event-details {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* dobogó badge már van nálad, de biztos ami biztos */
-.res-badge.gold { background: gold; color: black; }
-.res-badge.silver { background: silver; color: black; }
-.res-badge.bronze { background: #cd7f32; color: white; }
 
 /* =========================================
    13. MOBILE
-   ========================================= */
+========================================= */
 @media (max-width: 1024px) {
-  .layout,
   .calendar-layout {
     grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    position: fixed;
-    left: -100%;
-    top: 0;
-    width: 280px;
-    height: 100%;
-    background: var(--card-bg);
-    transition: 0.3s;
-    z-index: 999;
-    padding: 20px;
-  }
-
-  .sidebar.open {
-    left: 0;
   }
 
   .calendar-grid {
@@ -558,13 +316,12 @@ button {
 }
 
 /* =========================================
-   13. RAINBOW EXTRA
-   ========================================= */
-[data-theme="rainbow"] .card,
+   14. RAINBOW MODE EXTRA
+========================================= */
 [data-theme="rainbow"] .day,
 [data-theme="rainbow"] .event-card {
   background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
 }
 
 [data-theme="rainbow"] .month-display-container {
