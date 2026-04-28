@@ -272,7 +272,7 @@ function renderEvents(results, container) {
                 r.final === "3" ? "bronze" : "";
 
             html += `
-                <div class="event-card" onclick="toggleEvent('${id}')">
+                <div class="event-card" data-event-id="${id}">
 
                     <div class="event-top">
                         <div class="event-title">${r.event}</div>
