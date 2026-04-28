@@ -61,6 +61,7 @@ export async function initCalendarPage() {
         renderCalendar();
         renderFilters();
         renderStats();
+       buildEventIndex();
 
     } catch (e) {
         console.error("Calendar init error:", e);
