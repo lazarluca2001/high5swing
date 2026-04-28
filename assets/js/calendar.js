@@ -121,11 +121,13 @@ function renderCalendar() {
 
     if (!cal || !header) return;
 
+    const now = new Date();
+    const year = now.getFullYear();
+
     header.innerText = CAL_CONFIG.months[currentMonthIdx];
 
     const fragment = document.createDocumentFragment();
 
-    // WEEKDAYS
     CAL_CONFIG.weekdays.forEach(d => {
         const el = document.createElement("div");
         el.className = "weekday";
@@ -133,7 +135,6 @@ function renderCalendar() {
         fragment.appendChild(el);
     });
 
-    const year = 2026;
     const firstDay = (new Date(year, currentMonthIdx, 1).getDay() + 6) % 7;
     const days = new Date(year, currentMonthIdx + 1, 0).getDate();
 
@@ -151,19 +152,17 @@ function renderCalendar() {
         const dayEl = document.createElement("div");
         dayEl.className = "day" + (ts === todayTs ? " today" : "");
 
-        // stagger animation delay
         dayEl.style.animationDelay = `${d * 0.01}s`;
-
         dayEl.innerHTML = `<div class="day-number">${d}</div>`;
 
-        const events = allEvents
-            .filter(e => ts >= e._startTs && ts <= e._endTs)
-            .filter(e =>
-                !activeFilter ||
+        let events = eventsByDay[ts] || [];
+
+        if (activeFilter) {
+            events = events.filter(e =>
                 e._participants.some(p => p.name === activeFilter)
             );
+        }
 
-        // max 3 event
         events.slice(0, 3).forEach(e => {
             const eventEl = document.createElement("div");
             eventEl.className = "event-card";
@@ -177,15 +176,14 @@ function renderCalendar() {
                 `).join("")}
             `;
 
-            // click interaction
-            eventEl.onclick = () => {
+            eventEl.addEventListener("click", (ev) => {
+                ev.stopPropagation(); // 🔥 FIX
                 eventEl.classList.toggle("open");
-            };
+            });
 
             dayEl.appendChild(eventEl);
         });
 
-        // +X esemény badge
         if (events.length > 3) {
             const more = document.createElement("div");
             more.className = "more-events";
