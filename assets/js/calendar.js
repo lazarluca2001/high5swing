@@ -125,6 +125,7 @@ function renderCalendar() {
 
     const fragment = document.createDocumentFragment();
 
+    // WEEKDAYS
     CAL_CONFIG.weekdays.forEach(d => {
         const el = document.createElement("div");
         el.className = "weekday";
@@ -150,6 +151,9 @@ function renderCalendar() {
         const dayEl = document.createElement("div");
         dayEl.className = "day" + (ts === todayTs ? " today" : "");
 
+        // stagger animation delay
+        dayEl.style.animationDelay = `${d * 0.01}s`;
+
         dayEl.innerHTML = `<div class="day-number">${d}</div>`;
 
         const events = allEvents
@@ -159,7 +163,8 @@ function renderCalendar() {
                 e._participants.some(p => p.name === activeFilter)
             );
 
-        events.forEach(e => {
+        // max 3 event
+        events.slice(0, 3).forEach(e => {
             const eventEl = document.createElement("div");
             eventEl.className = "event-card";
 
@@ -172,8 +177,21 @@ function renderCalendar() {
                 `).join("")}
             `;
 
+            // click interaction
+            eventEl.onclick = () => {
+                eventEl.classList.toggle("open");
+            };
+
             dayEl.appendChild(eventEl);
         });
+
+        // +X esemény badge
+        if (events.length > 3) {
+            const more = document.createElement("div");
+            more.className = "more-events";
+            more.textContent = `+${events.length - 3} esemény`;
+            dayEl.appendChild(more);
+        }
 
         fragment.appendChild(dayEl);
     }
@@ -182,6 +200,9 @@ function renderCalendar() {
     cal.appendChild(fragment);
 }
 
+/* =========================
+   FILTERS
+========================= */
 function renderFilters() {
     const box = document.getElementById("memberFilter");
     if (!box) return;
@@ -193,6 +214,9 @@ function renderFilters() {
     `).join("");
 }
 
+/* =========================
+   STATS
+========================= */
 function renderStats() {
     const el = document.getElementById("activityChart");
     if (!el) return;
